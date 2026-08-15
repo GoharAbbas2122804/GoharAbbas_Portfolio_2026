@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(node -e const THREE = require('three'); console.log('ShaderMaterial:', typeof THREE.ShaderMaterial); console.log('AdditiveBlending:', THREE.AdditiveBlending); const c = new THREE.Clock(); setTimeout(() => console.log('elapsedTime:', c.elapsedTime), 10);)",
+      "Shell(npx tsc --noEmit --pretty 2 >& 1)",
+      "Shell(node -e const p = require('three/package.json'); console.log(JSON.stringify(p.exports, null, 2)) 2 > /dev/null)",
+      "Shell(npx tsc --noEmit -p tsconfig.json 2 >& 1)",
+      "Shell(node -e const p = JSON.parse(require('fs').readFileSync('node_modules/three/package.json','utf8')); console.log('main:', p.main); console.log('module:', p.module); console.log('types:', p.types); console.log('typings:', p.typings))",
+      "Shell(node -e  const ts = require('typescript'); const program = ts.createProgram(['components/ui/hero_jellyfish.tsx'], { moduleResolution: ts.ModuleResolutionKind.Bundler, allowJs: true, strict: true, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2017, module: ts.ModuleKind.ESNext, }); const sourceFile = program.getSourceFile('components/ui/hero_jellyfish.tsx'); const typeChecker = program.getTypeChecker(); const threeSymbol = typeChecker.resolveName('three', sourceFile!, ts.SymbolFlags.Module, false); if (threeSymbol) { console.log('three resolved to:', threeSymbol.getEscapedName()); const exports = typeChecker.getExportsOfModule(threeSymbol); const shaderMat = exports.find(e => e.getEscapedName() === 'ShaderMaterial'); console.log('ShaderMaterial found:', !!shaderMat); }  2 >& 1)",
+      "Shell(npx tsc --traceResolution --noEmit 2 >& 1)",
+      "Shell(grep -c \"ShaderMaterial\" /home/goharabbas/Downloads/portfolio_2026/node_modules/@types/three/src/Three.Legacy.d.ts 2>/dev/null; grep \"ShaderMaterial\" /home/goharabbas/Downloads/portfolio_2026/node_modules/@types/three/src/Three.Legacy.d.ts | head -5)",
+      "Shell(node -e  const THREE = require('three'); console.log('ShaderMaterial:', typeof THREE.ShaderMaterial); console.log('AdditiveBlending:', THREE.AdditiveBlending); console.log('Float32BufferAttribute:', typeof THREE.Float32BufferAttribute); const c = new THREE.Clock(); console.log('elapsedTime:', c.elapsedTime); console.log('getElapsedTime:', typeof c.getElapsedTime); )",
+      "Shell(cd /home/goharabbas/Downloads/portfolio_2026 && cat > /tmp/test-three.ts << 'EOF' import * as THREE from \"three\"; const s = new THREE.ShaderMaterial({}); const b = THREE.AdditiveBlending; const c = new THREE.Clock(); c.elapsedTime; EOF npx tsc --noEmit --moduleResolution bundler --module esnext --target es2017 --strict --jsx react-jsx --skipLibCheck /tmp/test-three.ts 2>&1)",
+      "Shell(npm:*)",
+      "Shell(node -p require('/home/goharabbas/Downloads/portfolio_2026/node_modules/gsap/package.json').version)",
+      "Shell(ps:*)",
+      "Shell(grep:*)",
+      "Shell(ss:*)",
+      "Shell(kill 434414 2>/dev/null; sleep 1; ps aux | grep \"next dev\" | grep -v grep || echo \"dev server stopped\"; rm -rf .next && echo \".next cache cleared\")",
+      "Shell(kill 439437 2>/dev/null; sleep 1; ps aux | grep \"next dev\" | grep -v grep || echo \"all dev servers stopped\")",
+      "Shell(curl -s -o /dev/null -w %{http_code} http://localhost:3000)",
+      "Shell(curl -s http://localhost:3000)",
+      "Shell(for p in three @types/three @react-three/fiber; do v=$(node -p \"try{require('./node_modules/$p/package.json').version}catch(e){'MISSING'}\"); echo \"$p: $v\"; done)",
+      "Shell(rm:*)",
+      "Shell(rmdir:*)",
+      "Shell(npx tsc --noEmit)"
+    ],
+    "deny": [],
+    "defaultMode": "default"
+  }
+}
