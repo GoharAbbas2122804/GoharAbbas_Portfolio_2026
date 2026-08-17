@@ -1,3 +1,4 @@
+"use client";
 
 import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
@@ -8,7 +9,7 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(CustomEase);
 }
 
-export function Component() {
+export function Navbar() {
   // We need a ref for the parent container to scope GSAP
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -126,13 +127,14 @@ export function Component() {
             // OPEN
             if (navWrap) navWrap.setAttribute("data-nav", "open");
             
-            tl.set(navWrap, { display: "block" })
-              .set(menu, { xPercent: 0 }, "<")
-              // Animate Button Text Swapping if it exists
-              .fromTo(menuButtonTexts, { yPercent: 0 }, { yPercent: -100, stagger: 0.2 })
-              .fromTo(menuButtonIcon, { rotate: 0 }, { rotate: 315 }, "<")
+            if (menuButtonTexts && menuButtonTexts.length) {
+              tl.fromTo(menuButtonTexts, { yPercent: 0 }, { yPercent: -100, stagger: 0.2 });
+            }
+            if (menuButtonIcon) {
+              tl.fromTo(menuButtonIcon, { rotate: 0 }, { rotate: 315 }, "<");
+            }
               
-              .fromTo(overlay, { autoAlpha: 0 }, { autoAlpha: 1 }, "<")
+            tl.fromTo(overlay, { autoAlpha: 0 }, { autoAlpha: 1 }, "<")
               .fromTo(bgPanels, { xPercent: 101 }, { xPercent: 0, stagger: 0.12, duration: 0.575 }, "<")
               .fromTo(menuLinks, { yPercent: 140, rotate: 10 }, { yPercent: 0, rotate: 0, stagger: 0.05 }, "<+=0.35");
               
@@ -146,12 +148,16 @@ export function Component() {
             if (navWrap) navWrap.setAttribute("data-nav", "closed");
 
             tl.to(overlay, { autoAlpha: 0 })
-              .to(menu, { xPercent: 120 }, "<")
-              // Animate Button Text and Icon Back
-              .to(menuButtonTexts, { yPercent: 0 }, "<")
-              .to(menuButtonIcon, { rotate: 0 }, "<")
+              .to(menu, { xPercent: 120 }, "<");
+              
+            if (menuButtonTexts && menuButtonTexts.length) {
+              tl.to(menuButtonTexts, { yPercent: 0 }, "<");
+            }
+            if (menuButtonIcon) {
+              tl.to(menuButtonIcon, { rotate: 0 }, "<");
+            }
 
-              .set(navWrap, { display: "none" });
+            tl.set(navWrap, { display: "none" });
         }
 
       }, containerRef);

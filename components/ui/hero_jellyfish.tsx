@@ -35,9 +35,9 @@ const GRAIN =
    and turns away while the next word rounds into view. backface-visibility hides the
    half of the ring that faces away, and each word's own opacity bump (jelly-fade,
    phase-locked to the orbit) keeps just one phrase dominant at a time. */
-const PHRASES = ["GOHAR", "WEB DEV", "APP DEV", "AIML", "AGENTS"];
+const PHRASES = ["WEB-DEV", "APP-DEV", "AI/ML", "AI/AGENTS"];
 const LOOP = 20; // seconds for one full 360° orbit of the camera around the jellyfish
-const RING_N = PHRASES.length; // words evenly spaced around the ring
+const RING_N = PHRASES.length ; // words evenly spaced around the ring
 const RING_STEP = 360 / RING_N; // angular gap between neighbouring words (deg)
 const RING_R = 660; // px — radius of the word ring (how far each word stands from the hub)
 const PERSP = 2200; // px — camera distance; smaller = stronger perspective foreshortening
@@ -500,8 +500,8 @@ export default function JellyfishDrift() {
             opacity: 0.75,
           }}
         >
-          <span>[ CREATIVE STUDIO ]</span>
-          <span>[ GET IN TOUCH ]</span>
+          {/* <span>[ CREATIVE STUDIO ]</span> */}
+          {/* <span>[ GET IN TOUCH ]</span> */}
         </div>
       </header>
 
@@ -552,40 +552,23 @@ export default function JellyfishDrift() {
                 whiteSpace: "nowrap",
                 color: INK,
                 opacity: 0,
-                // Pin the word at its fixed seat on the ring, then flip it to face
-                // INWARD (toward the hub). The readable word therefore rounds the FAR
-                // side of the ring and faces us through the centre — concave, like the
-                // inside of a cylinder — passing behind the jellyfish.
+                // Pin the word at its fixed seat on the ring, facing INWARD (rotateY 180deg).
+                // It rounds the far side behind the jellyfish, sweeping from LEFT to RIGHT.
                 transform: `rotateY(${(i * RING_STEP).toFixed(2)}deg) translateZ(${RING_R}px) rotateY(180deg)`,
                 backfaceVisibility: "hidden",
                 WebkitBackfaceVisibility: "hidden",
-                // Opacity bump phase-locked to the orbit so this word is bright only
-                // while it faces the camera. Inward facing puts that moment half a loop
-                // later (far side instead of near), so shift the phase by LOOP/2.
-                animation: `jelly-fade ${LOOP}s linear ${(
-                  (-LOOP * ((RING_N - i) % RING_N)) / RING_N -
-                  LOOP / 2
-                ).toFixed(3)}s infinite`,
-                willChange: "opacity",
+                // Phase-locked delay: each word reaches dead-centre in exact sequence (0 -> 1 -> 2 -> 3)
+                animation: `jelly-fade ${LOOP}s linear ${(-LOOP / 2 - (LOOP * i) / RING_N).toFixed(3)}s infinite`,
+                willChange: "opacity, filter",
               }}
             >
-              {/* Entrance: as EACH word turns into frame on the left it RISES up from a
-                  sat-down seat to its default position, settling just before centre —
-                  one smooth flow inside the box's perspective. On the way out it simply
-                  rests at default and fades, so only the entrance carries the rise.
-                  Phase-locked to the same orbit moment as the opacity fade. */}
               <span
                 style={{
                   display: "inline-block",
-                  animation: `jelly-rise ${LOOP}s linear ${(
-                    (-LOOP * ((RING_N - i) % RING_N)) / RING_N -
-                    LOOP / 2
-                  ).toFixed(3)}s infinite`,
+                  animation: `jelly-glide ${LOOP}s linear ${(-LOOP / 2 - (LOOP * i) / RING_N).toFixed(3)}s infinite`,
                   willChange: "transform",
                 }}
               >
-                {/* Inner scaleX fakes an ultra-condensed, poster-tall cut without
-                    shipping a condensed font — keeps the outer 3D transform clean. */}
                 <span
                   style={{
                     display: "inline-block",
@@ -842,28 +825,22 @@ const JELLY_CSS = `
    front-facing phrase reads. backface-visibility already hides the far side; this
    simply narrows it to one dominant word and gives a soft emerge/recede at the edges. */
 @keyframes jelly-fade{
-  0%{opacity:1}
-  10%{opacity:1}
-  21%{opacity:0}
-  79%{opacity:0}
-  90%{opacity:1}
-  100%{opacity:1}
+  0%{opacity:1; filter:blur(0px)}
+  12%{opacity:1; filter:blur(0px)}
+  28%{opacity:0; filter:blur(4px)}
+  72%{opacity:0; filter:blur(4px)}
+  88%{opacity:1; filter:blur(0px)}
+  100%{opacity:1; filter:blur(0px)}
 }
 
-/* Entrance rise — phase-locked to jelly-fade (same delay). The word rests at its
-   default position through the visible centre + exit (0%→21%), drops to a sat-down
-   seat while it's hidden on the back half (21%→79%), then RISES smoothly back up to
-   default as it turns into frame, settling right as it reaches centre (79%→100%).
-   ease-out on that last leg makes it glide up and settle rather than snap. */
-@keyframes jelly-rise{
-  0%{transform:translateY(0)}
-  21%{transform:translateY(0)}
-  50%{transform:translateY(32vh)}
-  78%{transform:translateY(32vh);animation-timing-function:ease-out}
-  /* snaps up to default EARLY — fully risen well before it reaches centre, then it
-     just cruises in at default height. */
-  87%{transform:translateY(0)}
-  100%{transform:translateY(0)}
+/* Gentle left-to-right horizontal glide */
+@keyframes jelly-glide{
+  0%{transform:translateX(0)}
+  12%{transform:translateX(3.5vw)}
+  28%{transform:translateX(9vw)}
+  72%{transform:translateX(-9vw)}
+  88%{transform:translateX(-3.5vw)}
+  100%{transform:translateX(0)}
 }
 
 /* The manifesto rises during the calm seam (after the last phrase clears) and

@@ -1,5 +1,7 @@
 import About from "@/components/ui/about";
+import Hero from "@/components/ui/hero";
 import JellyfishDrift from "@/components/ui/hero_jellyfish";
+import { Navbar } from "@/components/ui/menu_navbar";
 import {
   ABOUT_CONFIG,
   ABOUT_LOCATION,
@@ -9,8 +11,10 @@ import {
 
 export default function Home() {
   return (
-    <main className="flex-1">
+    <main className="flex-1 relative">
+      <Navbar />
       <JellyfishDrift />
+      <Hero />
       <About
         projects={ABOUT_PROJECTS}
         config={ABOUT_CONFIG}
