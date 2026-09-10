@@ -5,3 +5,4 @@
 - Uses Tailwind CSS v4 (via `@tailwindcss/postcss` in `postcss.config.mjs`). Confidence: 0.6
 - Prefers separating component data/props into a dedicated constants file (e.g., `constant.ts`) rather than inlining them, and is open to the agent choosing the most appropriate filename/structure for the case. Confidence: 0.7
 - Gives high-level, end-goal directives ("fix the errors and render this as my hero section") and expects the agent to autonomously handle dependency installs, version mismatches, build/tooling errors (e.g., missing PostCSS/Tailwind modules), and page integration. Confidence: 0.6
+- Sometimes authors their own components (e.g., a services section) rather than pulling from a library, and provides demo/usage code as the reference for how the component should be wired into `app/page.tsx` (including wrapper markup like the `h-screen w-full` container). Confidence: 0.6

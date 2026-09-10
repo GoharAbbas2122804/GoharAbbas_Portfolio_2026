@@ -1,7 +1,9 @@
 import About from "@/components/ui/about";
+import Certificates from "@/components/ui/certificates";
 import Hero from "@/components/ui/hero";
-import JellyfishDrift from "@/components/ui/hero_jellyfish";
 import { Navbar } from "@/components/ui/menu_navbar";
+import Services from "@/components/ui/services";
+import ParallaxStripSlider from "@/components/ui/services";
 import {
   ABOUT_CONFIG,
   ABOUT_LOCATION,
@@ -13,7 +15,6 @@ export default function Home() {
   return (
     <main className="flex-1 relative">
       <Navbar />
-      <JellyfishDrift />
       <Hero />
       <About
         projects={ABOUT_PROJECTS}
@@ -21,6 +22,11 @@ export default function Home() {
         socialLinks={ABOUT_SOCIAL_LINKS}
         location={ABOUT_LOCATION}
       />
+      <div className="h-screen w-full">
+        <ParallaxStripSlider />
+      </div>
+      <Services />
+      <Certificates />
     </main>
   );
 }
