@@ -23,7 +23,10 @@
       "Shell(for p in three @types/three @react-three/fiber; do v=$(node -p \"try{require('./node_modules/$p/package.json').version}catch(e){'MISSING'}\"); echo \"$p: $v\"; done)",
       "Shell(rm:*)",
       "Shell(rmdir:*)",
-      "Shell(npx tsc --noEmit)"
+      "Shell(npx tsc --noEmit)",
+      "Shell(command:*)",
+      "Shell(identify:*)",
+      "Shell(python3 -c from PIL import Image; im=Image.open('app/assets/Images/portfolioProfile.jpeg'); print(im.size))"
     ],
     "deny": [],
     "defaultMode": "default"

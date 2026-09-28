@@ -2,7 +2,7 @@
 
 import React from "react";
 
-export default function Hero() {
+export default function projectsShowcase() {
   const scrollToAbout = () => {
     const aboutElem = document.querySelector(".about-section");
     if (aboutElem) {

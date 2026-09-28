@@ -6,3 +6,12 @@
 - Prefers separating component data/props into a dedicated constants file (e.g., `constant.ts`) rather than inlining them, and is open to the agent choosing the most appropriate filename/structure for the case. Confidence: 0.7
 - Gives high-level, end-goal directives ("fix the errors and render this as my hero section") and expects the agent to autonomously handle dependency installs, version mismatches, build/tooling errors (e.g., missing PostCSS/Tailwind modules), and page integration. Confidence: 0.6
 - Sometimes authors their own components (e.g., a services section) rather than pulling from a library, and provides demo/usage code as the reference for how the component should be wired into `app/page.tsx` (including wrapper markup like the `h-screen w-full` container). Confidence: 0.6
+- Prefers Tailwind CSS (arbitrary values welcome) for all styling/layout and avoids CSS-in-JS, inline style objects for animation, global CSS leaks, and external UI libraries. Confidence: 0.7
+- Wraps all GSAP animation in gsap.context (or useGSAP with a scope) and reverts on unmount for StrictMode safety and zero memory leaks. Confidence: 0.7
+- Respects `prefers-reduced-motion`: skips parallax and continuous motion, falling back to simple fades. Confidence: 0.7
+- Prefers `expo.out` / `power4.out` easing and never bouncy/elastic easing in motion design. Confidence: 0.7
+- Optimizes for 60fps with GPU-accelerated transforms (force3D/transform3d), avoids layout shift/jank, and scales effect density (e.g., canvas element count) down on mobile. Confidence: 0.6
+- Holds a high quality bar and wants production-grade, pixel-perfect code: strict TypeScript, typed refs, semantic JSX, commented sections, and default-exported components. Confidence: 0.65
+- Prefers complete, drop-in-ready deliverables in a single code block with no explanations and no placeholder TODOs. Confidence: 0.7
+- Typography taste: high-contrast didone serif (Playfair Display) for display type with ligatures, paired with Space Grotesk for UI/mono labels, loaded from Google Fonts. Confidence: 0.5
+- Prefers PascalCase file names for React components (e.g., `Hero.tsx` rather than `hero.tsx`). Confidence: 0.6

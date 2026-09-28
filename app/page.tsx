@@ -1,9 +1,10 @@
 import About from "@/components/ui/about";
 import Certificates from "@/components/ui/certificates";
-import Hero from "@/components/ui/hero";
+import Hero from "@/components/ui/Hero";
 import { Navbar } from "@/components/ui/menu_navbar";
 import Services from "@/components/ui/services";
-import ParallaxStripSlider from "@/components/ui/services";
+import CtaSection from "@/components/ui/cta_section";
+import Footer from "@/components/ui/footer";
 import {
   ABOUT_CONFIG,
   ABOUT_LOCATION,
@@ -13,7 +14,7 @@ import {
 
 export default function Home() {
   return (
-    <main className="flex-1 relative">
+    <main className="flex-1 relative bg-[#0b0b0c] min-h-screen text-white overflow-x-hidden">
       <Navbar />
       <Hero />
       <About
@@ -22,11 +23,14 @@ export default function Home() {
         socialLinks={ABOUT_SOCIAL_LINKS}
         location={ABOUT_LOCATION}
       />
-      <div className="h-screen w-full">
-        <ParallaxStripSlider />
-      </div>
+      {/* <ScrollServices  /> */}
       <Services />
       <Certificates />
+      <CtaSection />
+      <Footer />
     </main>
   );
 }
+
+
+

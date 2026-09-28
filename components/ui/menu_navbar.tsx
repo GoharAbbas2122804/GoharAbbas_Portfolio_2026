@@ -10,239 +10,226 @@ if (typeof window !== "undefined") {
 }
 
 export function Navbar() {
-  // We need a ref for the parent container to scope GSAP
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  // Scroll direction detection: visible at top or when scrolling up, hidden when scrolling down
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (isMenuOpen) {
+        setIsVisible(true);
+        return;
+      }
+
+      if (currentScrollY < 100) {
+        setIsVisible(true);
+      } else {
+        const diff = currentScrollY - lastScrollY.current;
+        if (diff > 8) {
+          setIsVisible(false);
+        } else if (diff < -8) {
+          setIsVisible(true);
+        }
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isMenuOpen]);
 
   // Initial Setup & Hover Effects
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Create custom easing
     try {
-        if (!gsap.parseEase("main")) {
-            CustomEase.create("main", "0.65, 0.01, 0.05, 0.99");
-            gsap.defaults({ ease: "main", duration: 0.7 });
-        }
+      if (!gsap.parseEase("main")) {
+        CustomEase.create("main", "0.65, 0.01, 0.05, 0.99");
+        gsap.defaults({ ease: "main", duration: 0.7 });
+      }
     } catch (e) {
-        console.warn("CustomEase failed to load, falling back to default.", e);
-        gsap.defaults({ ease: "power2.out", duration: 0.7 });
+      console.warn("CustomEase failed to load, falling back to default.", e);
+      gsap.defaults({ ease: "power2.out", duration: 0.7 });
     }
 
     const ctx = gsap.context(() => {
-      // 1. Arrow Animation (Removed from indicator, but keeping logic if arrow existed/restored elsewhere)
-      // Since arrow is removed from JSX, this selector won't find anything, which is fine (safe check).
-      const arrowLine = document.querySelector(".arrow-line");
-      if (arrowLine) {
-        const pathLength = (arrowLine as SVGPathElement).getTotalLength();
-        gsap.set(arrowLine, { strokeDasharray: pathLength, strokeDashoffset: pathLength });
-        const arrowTl = gsap.timeline({ repeat: -1, repeatDelay: 0.8 });
-        arrowTl
-          .to(arrowLine, { strokeDashoffset: 0, duration: 1, ease: "power2.out" })
-          .to({}, { duration: 1.2 })
-          .to(arrowLine, { strokeDashoffset: -pathLength, duration: 0.6, ease: "power2.in" })
-          .set(arrowLine, { strokeDashoffset: pathLength });
-      }
-
-      // 2. Shape Hover
-      // Updated Selectors: .menu-list-item -> .menu-list-item, .abstract-shapes -> .ambient-background-shapes
       const menuItems = containerRef.current!.querySelectorAll(".menu-list-item[data-shape]");
       const shapesContainer = containerRef.current!.querySelector(".ambient-background-shapes");
-      
+
       menuItems.forEach((item) => {
         const shapeIndex = item.getAttribute("data-shape");
-        // Updated Selector: .shape -> .bg-shape
         const shape = shapesContainer ? shapesContainer.querySelector(`.bg-shape-${shapeIndex}`) : null;
-        
+
         if (!shape) return;
 
-        // Updated Selector: .shape-el -> .shape-element
         const shapeEls = shape.querySelectorAll(".shape-element");
 
         const onEnter = () => {
-             if (shapesContainer) {
-                 // Updated Selector: .shape -> .bg-shape
-                 shapesContainer.querySelectorAll(".bg-shape").forEach((s) => s.classList.remove("active"));
-             }
-             shape.classList.add("active");
-             
-             gsap.fromTo(shapeEls, 
-                { scale: 0.5, opacity: 0, rotation: -10 },
-                { scale: 1, opacity: 1, rotation: 0, duration: 0.6, stagger: 0.08, ease: "back.out(1.7)", overwrite: "auto" }
-             );
+          if (shapesContainer) {
+            shapesContainer.querySelectorAll(".bg-shape").forEach((s) => s.classList.remove("active"));
+          }
+          shape.classList.add("active");
+
+          gsap.fromTo(
+            shapeEls,
+            { scale: 0.5, opacity: 0, rotation: -10 },
+            { scale: 1, opacity: 1, rotation: 0, duration: 0.6, stagger: 0.08, ease: "back.out(1.7)", overwrite: "auto" }
+          );
         };
-        
+
         const onLeave = () => {
-            gsap.to(shapeEls, {
-                scale: 0.8, opacity: 0, duration: 0.3, ease: "power2.in",
-                onComplete: () => shape.classList.remove("active"),
-                overwrite: "auto"
-            });
+          gsap.to(shapeEls, {
+            scale: 0.8,
+            opacity: 0,
+            duration: 0.3,
+            ease: "power2.in",
+            onComplete: () => shape.classList.remove("active"),
+            overwrite: "auto",
+          });
         };
 
         item.addEventListener("mouseenter", onEnter);
         item.addEventListener("mouseleave", onLeave);
-        
+
         (item as any)._cleanup = () => {
-            item.removeEventListener("mouseenter", onEnter);
-            item.removeEventListener("mouseleave", onLeave);
+          item.removeEventListener("mouseenter", onEnter);
+          item.removeEventListener("mouseleave", onLeave);
         };
       });
-      
     }, containerRef);
 
     return () => {
-        ctx.revert();
-        if (containerRef.current) {
-            const items = containerRef.current.querySelectorAll(".menu-list-item[data-shape]");
-            items.forEach((item: any) => item._cleanup && item._cleanup());
-        }
+      ctx.revert();
+      if (containerRef.current) {
+        const items = containerRef.current.querySelectorAll(".menu-list-item[data-shape]");
+        items.forEach((item: any) => item._cleanup && item._cleanup());
+      }
     };
   }, []);
 
   // Menu Open/Close Animation Effect
   useEffect(() => {
-      if (!containerRef.current) return;
-      
-      const ctx = gsap.context(() => {
-        // Updated Selectors: .nav -> .nav-overlay-wrapper, .menu -> .menu-content
-        const navWrap = containerRef.current!.querySelector(".nav-overlay-wrapper");
-        const menu = containerRef.current!.querySelector(".menu-content");
-        const overlay = containerRef.current!.querySelector(".overlay");
-        // Updated Selector: .bg-panel -> .backdrop-layer
-        const bgPanels = containerRef.current!.querySelectorAll(".backdrop-layer");
-        // Updated Selector: .menu-link -> .nav-link
-        const menuLinks = containerRef.current!.querySelectorAll(".nav-link");
-        const fadeTargets = containerRef.current!.querySelectorAll("[data-menu-fade]");
-        
-        // Updated Selector: .menu-button -> .nav-close-btn
-        const menuButton = containerRef.current!.querySelector(".nav-close-btn");
-        const menuButtonTexts = menuButton?.querySelectorAll("p");
-        // Updated Selector: .menu-button-icon -> .menu-button-icon (unchanged in CSS/JSX?) No, wait, CSS had .menu-button-icon
-        const menuButtonIcon = menuButton?.querySelector(".menu-button-icon");
+    if (!containerRef.current) return;
 
-        const tl = gsap.timeline();
-        
-        if (isMenuOpen) {
-            // OPEN
-            if (navWrap) navWrap.setAttribute("data-nav", "open");
-            
-            if (menuButtonTexts && menuButtonTexts.length) {
-              tl.fromTo(menuButtonTexts, { yPercent: 0 }, { yPercent: -100, stagger: 0.2 });
-            }
-            if (menuButtonIcon) {
-              tl.fromTo(menuButtonIcon, { rotate: 0 }, { rotate: 315 }, "<");
-            }
-              
-            tl.fromTo(overlay, { autoAlpha: 0 }, { autoAlpha: 1 }, "<")
-              .fromTo(bgPanels, { xPercent: 101 }, { xPercent: 0, stagger: 0.12, duration: 0.575 }, "<")
-              .fromTo(menuLinks, { yPercent: 140, rotate: 10 }, { yPercent: 0, rotate: 0, stagger: 0.05 }, "<+=0.35");
-              
-            if (fadeTargets.length) {
-                // Keep clearProps: "all" for blog entry fix
-                tl.fromTo(fadeTargets, { autoAlpha: 0, yPercent: 50 }, { autoAlpha: 1, yPercent: 0, stagger: 0.04, clearProps: "all" }, "<+=0.2");
-            }
+    const ctx = gsap.context(() => {
+      const navWrap = containerRef.current!.querySelector(".nav-overlay-wrapper");
+      const menu = containerRef.current!.querySelector(".menu-content");
+      const overlay = containerRef.current!.querySelector(".overlay");
+      const bgPanels = containerRef.current!.querySelectorAll(".backdrop-layer");
+      const menuLinks = containerRef.current!.querySelectorAll(".nav-link");
+      const fadeTargets = containerRef.current!.querySelectorAll("[data-menu-fade]");
 
-        } else {
-            // CLOSE
-            if (navWrap) navWrap.setAttribute("data-nav", "closed");
+      const menuButton = containerRef.current!.querySelector(".nav-close-btn");
+      const menuButtonTexts = menuButton?.querySelectorAll("p");
+      const menuButtonIcon = menuButton?.querySelector(".menu-button-icon");
 
-            tl.to(overlay, { autoAlpha: 0 })
-              .to(menu, { xPercent: 120 }, "<");
-              
-            if (menuButtonTexts && menuButtonTexts.length) {
-              tl.to(menuButtonTexts, { yPercent: 0 }, "<");
-            }
-            if (menuButtonIcon) {
-              tl.to(menuButtonIcon, { rotate: 0 }, "<");
-            }
+      const tl = gsap.timeline();
 
-            tl.set(navWrap, { display: "none" });
+      if (isMenuOpen) {
+        // OPEN MENU
+        if (navWrap) navWrap.setAttribute("data-nav", "open");
+
+        if (menuButtonTexts && menuButtonTexts.length) {
+          tl.fromTo(menuButtonTexts, { yPercent: 0 }, { yPercent: -100, duration: 0.4 });
+        }
+        // Rotate '+' icon 45deg to create cross '×'
+        if (menuButtonIcon) {
+          tl.to(menuButtonIcon, { rotate: 45, duration: 0.4, ease: "back.out(1.7)" }, "<");
         }
 
-      }, containerRef);
-      
-      return () => ctx.revert();
+        tl.fromTo(overlay, { autoAlpha: 0 }, { autoAlpha: 1 }, "<")
+          .fromTo(bgPanels, { xPercent: 101 }, { xPercent: 0, stagger: 0.12, duration: 0.575 }, "<")
+          .fromTo(menuLinks, { yPercent: 140, rotate: 10 }, { yPercent: 0, rotate: 0, stagger: 0.05 }, "<+=0.35");
+
+        if (fadeTargets.length) {
+          tl.fromTo(
+            fadeTargets,
+            { autoAlpha: 0, yPercent: 50 },
+            { autoAlpha: 1, yPercent: 0, stagger: 0.04, clearProps: "all" },
+            "<+=0.2"
+          );
+        }
+      } else {
+        // CLOSE MENU
+        if (navWrap) navWrap.setAttribute("data-nav", "closed");
+
+        tl.to(overlay, { autoAlpha: 0 }).to(menu, { xPercent: 120 }, "<");
+
+        if (menuButtonTexts && menuButtonTexts.length) {
+          tl.to(menuButtonTexts, { yPercent: 0, duration: 0.3 }, "<");
+        }
+        // Rotate back to 0deg (+)
+        if (menuButtonIcon) {
+          tl.to(menuButtonIcon, { rotate: 0, duration: 0.3, ease: "power2.inOut" }, "<");
+        }
+
+        tl.set(navWrap, { display: "none" });
+      }
+    }, containerRef);
+
+    return () => ctx.revert();
   }, [isMenuOpen]);
 
   // keydown Escape handling
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-        if (e.key === "Escape" && isMenuOpen) {
-            setIsMenuOpen(false);
-        }
+      if (e.key === "Escape" && isMenuOpen) {
+        setIsMenuOpen(false);
+      }
     };
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
   }, [isMenuOpen]);
 
-  const toggleMenu = () => setIsMenuOpen(prev => !prev);
+  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
     <div ref={containerRef}>
-        <div className="site-header-wrapper">
-          <header className="header">
-            <div className="container is--full">
-              <nav className="nav-row">
-                <a href="#" aria-label="home" className="nav-logo-row w-inline-block"></a>
-                <div className="nav-row__right">
-                  {/* Clean Menu Indicator (Arrow Removed) */}
-                  <div className="nav-toggle-label" onClick={toggleMenu} style={{ cursor: 'pointer', pointerEvents: 'auto' }}>
-                    <span className="toggle-text">click me</span>
-                  </div>
-                  
-                  {/* Restored Menu Button */}
-                  <button role="button" className="nav-close-btn" onClick={toggleMenu} style={{ pointerEvents: 'auto' }}>
-                    <div className="menu-button-text">
-                      <p className="p-large">Menu</p>
-                      <p className="p-large">Close</p>
-                    </div>
-                    <div className="icon-wrap">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="100%"
-                        viewBox="0 0 16 16"
-                        fill="none"
-                        className="menu-button-icon"
-                      >
-                        <path
-                          d="M7.33333 16L7.33333 -3.2055e-07L8.66667 -3.78832e-07L8.66667 16L7.33333 16Z"
-                          fill="currentColor"
-                        ></path>
-                        <path
-                          d="M16 8.66667L-2.62269e-07 8.66667L-3.78832e-07 7.33333L16 7.33333L16 8.66667Z"
-                          fill="currentColor"
-                        ></path>
-                        <path
-                          d="M6 7.33333L7.33333 7.33333L7.33333 6C7.33333 6.73637 6.73638 7.33333 6 7.33333Z"
-                          fill="currentColor"
-                        ></path>
-                        <path
-                          d="M10 7.33333L8.66667 7.33333L8.66667 6C8.66667 6.73638 9.26362 7.33333 10 7.33333Z"
-                          fill="currentColor"
-                        ></path>
-                        <path
-                          d="M6 8.66667L7.33333 8.66667L7.33333 10C7.33333 9.26362 6.73638 8.66667 6 8.66667Z"
-                          fill="currentColor"
-                        ></path>
-                        <path
-                          d="M10 8.66667L8.66667 8.66667L8.66667 10C8.66667 9.26362 9.26362 8.66667 10 8.66667Z"
-                          fill="currentColor"
-                        ></path>
-                      </svg>
-                    </div>
-                  </button>
-                </div>
-              </nav>
-            </div>
-          </header>
-        </div>
+      <div className="site-header-wrapper">
+        <button
+          role="button"
+          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          className={`nav-close-btn ${isMenuOpen ? "is-open" : ""} transition-all duration-300 ease-out transform ${
+            isVisible || isMenuOpen
+              ? "opacity-100 translate-y-0 pointer-events-auto"
+              : "opacity-0 -translate-y-6 pointer-events-none"
+          }`}
+          onClick={toggleMenu}
+        >
+          <div className="menu-button-text">
+            <p className="p-large font-semibold">Menu</p>
+            <p className="p-large font-semibold">Close</p>
+          </div>
+          <div className="icon-wrap flex items-center justify-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              className="menu-button-icon transition-transform duration-300"
+            >
+              <path
+                d="M7.33333 16L7.33333 0L8.66667 0L8.66667 16L7.33333 16Z"
+                fill="currentColor"
+              ></path>
+              <path
+                d="M16 8.66667L0 8.66667L0 7.33333L16 7.33333L16 8.66667Z"
+                fill="currentColor"
+              ></path>
+            </svg>
+          </div>
+        </button>
+      </div>
 
       <section className="fullscreen-menu-container">
         <div data-nav="closed" className="nav-overlay-wrapper">
-          {/* Overlay must stay above or below depending on desired clickability. 
-              The original has it cover content. */}
           <div className="overlay" onClick={closeMenu}></div>
           <nav className="menu-content">
             <div className="menu-bg">
@@ -250,9 +237,8 @@ export function Navbar() {
               <div className="backdrop-layer second"></div>
               <div className="backdrop-layer"></div>
 
-              {/* Abstract shapes container */}
+              {/* Ambient background shapes */}
               <div className="ambient-background-shapes">
-                {/* Shape 1: Floating circles */}
                 <svg className="bg-shape bg-shape-1" viewBox="0 0 400 400" fill="none">
                   <circle className="shape-element" cx="80" cy="120" r="40" fill="rgba(99,102,241,0.15)" />
                   <circle className="shape-element" cx="300" cy="80" r="60" fill="rgba(139,92,246,0.12)" />
@@ -260,7 +246,6 @@ export function Navbar() {
                   <circle className="shape-element" cx="350" cy="280" r="30" fill="rgba(99,102,241,0.15)" />
                 </svg>
 
-                {/* Shape 2: Wave pattern */}
                 <svg className="bg-shape bg-shape-2" viewBox="0 0 400 400" fill="none">
                   <path
                     className="shape-element"
@@ -278,7 +263,6 @@ export function Navbar() {
                   />
                 </svg>
 
-                {/* Shape 3: Grid dots */}
                 <svg className="bg-shape bg-shape-3" viewBox="0 0 400 400" fill="none">
                   <circle className="shape-element" cx="50" cy="50" r="8" fill="rgba(99,102,241,0.3)" />
                   <circle className="shape-element" cx="150" cy="50" r="8" fill="rgba(139,92,246,0.3)" />
@@ -296,7 +280,6 @@ export function Navbar() {
                   <circle className="shape-element" cx="300" cy="350" r="6" fill="rgba(236,72,153,0.3)" />
                 </svg>
 
-                {/* Shape 4: Organic blobs */}
                 <svg className="bg-shape bg-shape-4" viewBox="0 0 400 400" fill="none">
                   <path
                     className="shape-element"
@@ -310,7 +293,6 @@ export function Navbar() {
                   />
                 </svg>
 
-                {/* Shape 5: Diagonal lines */}
                 <svg className="bg-shape bg-shape-5" viewBox="0 0 400 400" fill="none">
                   <line className="shape-element" x1="0" y1="100" x2="300" y2="400" stroke="rgba(99,102,241,0.15)" strokeWidth="30" />
                   <line className="shape-element" x1="100" y1="0" x2="400" y2="300" stroke="rgba(139,92,246,0.12)" strokeWidth="25" />
@@ -322,32 +304,26 @@ export function Navbar() {
             <div className="menu-content-wrapper">
               <ul className="menu-list">
                 <li className="menu-list-item" data-shape="1">
-                  <a href="#" className="nav-link w-inline-block">
-                    <p className="nav-link-text">About us</p>
+                  <a href="#about" onClick={closeMenu} className="nav-link w-inline-block">
+                    <p className="nav-link-text">About</p>
                     <div className="nav-link-hover-bg"></div>
                   </a>
                 </li>
                 <li className="menu-list-item" data-shape="2">
-                  <a href="#" className="nav-link w-inline-block">
-                    <p className="nav-link-text">Our work</p>
-                    <div className="nav-link-hover-bg"></div>
-                  </a>
-                </li>
-                <li className="menu-list-item" data-shape="3">
-                  <a href="#" className="nav-link w-inline-block">
+                  <a href="#services" onClick={closeMenu} className="nav-link w-inline-block">
                     <p className="nav-link-text">Services</p>
                     <div className="nav-link-hover-bg"></div>
                   </a>
                 </li>
-                <li className="menu-list-item" data-shape="4">
-                  <a href="#" className="nav-link w-inline-block">
-                    <p className="nav-link-text" data-menu-fade>Blog</p>
+                <li className="menu-list-item" data-shape="3">
+                  <a href="#certificates" onClick={closeMenu} className="nav-link w-inline-block">
+                    <p className="nav-link-text">Certificates</p>
                     <div className="nav-link-hover-bg"></div>
                   </a>
                 </li>
-                <li className="menu-list-item" data-shape="5">
-                  <a href="#" className="nav-link w-inline-block">
-                    <p className="nav-link-text">Contact us</p>
+                <li className="menu-list-item" data-shape="4">
+                  <a href="#contact" onClick={closeMenu} className="nav-link w-inline-block">
+                    <p className="nav-link-text">Contact</p>
                     <div className="nav-link-hover-bg"></div>
                   </a>
                 </li>
