@@ -258,12 +258,12 @@ export default function Hero({
         "-=0.7"
       );
 
-      // 1. GSAP Right-to-Left Fast & Seamless Loop for GOHAR (left) and ABBAS (right) Behind Portrait
+      // 1. GSAP Right-to-Left 100% Mathematically Seamless Infinite Loop (Behind Portrait)
       if (nameTrack) {
         gsap.to(nameTrack, {
-          xPercent: -50,
+          xPercent: -33.33333333333333,
           repeat: -1,
-          duration: 10,
+          duration: 7,
           ease: "none",
         });
       }
@@ -372,7 +372,7 @@ export default function Hero({
           className="flex whitespace-nowrap will-change-transform"
         >
           {/* Set 1 */}
-          <div className="flex items-center gap-24 sm:gap-40 md:gap-60 lg:gap-80 pr-24 sm:pr-40 md:pr-60 lg:pr-80 shrink-0">
+          <div className="flex items-center gap-[20vw] pr-[20vw] shrink-0">
             <span className={`${playfair.className} text-[clamp(4.5rem,14vw,14rem)] font-black tracking-[-0.04em] uppercase text-black/90 leading-none drop-shadow-sm`}>
               GOHAR
             </span>
@@ -381,8 +381,18 @@ export default function Hero({
             </span>
           </div>
 
-          {/* Set 2 for 100% seamless, delay-free infinite loop */}
-          <div className="flex items-center gap-24 sm:gap-40 md:gap-60 lg:gap-80 pr-24 sm:pr-40 md:pr-60 lg:pr-80 shrink-0" aria-hidden="true">
+          {/* Set 2 */}
+          <div className="flex items-center gap-[20vw] pr-[20vw] shrink-0" aria-hidden="true">
+            <span className={`${playfair.className} text-[clamp(4.5rem,14vw,14rem)] font-black tracking-[-0.04em] uppercase text-black/90 leading-none drop-shadow-sm`}>
+              GOHAR
+            </span>
+            <span className={`${playfair.className} text-[clamp(4.5rem,14vw,14rem)] font-black tracking-[-0.04em] uppercase text-black/90 leading-none drop-shadow-sm`}>
+              ABBAS
+            </span>
+          </div>
+
+          {/* Set 3 */}
+          <div className="flex items-center gap-[20vw] pr-[20vw] shrink-0" aria-hidden="true">
             <span className={`${playfair.className} text-[clamp(4.5rem,14vw,14rem)] font-black tracking-[-0.04em] uppercase text-black/90 leading-none drop-shadow-sm`}>
               GOHAR
             </span>

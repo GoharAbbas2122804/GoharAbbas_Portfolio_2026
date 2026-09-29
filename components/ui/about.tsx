@@ -347,3 +347,20 @@ const About = ({
 };
 
 export default About;
+
+
+
+
+
+
+
+
+
+
+
+//  i have another component named certificates.tsx , i want to make some changes it in it
+// 1 - add a beautiful heading like certificates i have done or some thing more creative and unique
+// 2- this section should take full height and widht like 100dvh and maintain responsiveness across different screen sizes
+//  3- the certificates i have done are placed in directory /assets/certificates, i want to display all the certificates in a grid layout with some hover effects and animations
+// 4 - make sure to properly scan the images , according to names write platform from which i learn this certificates , course name and what i done have init , you can also research online to get the proper names of the platforms and courses if needed.
+//  5 - also add proper lazy loading , gsap scroll trigger animations for the certificates when they come into view, and make sure the grid is responsive and looks good on all devices.

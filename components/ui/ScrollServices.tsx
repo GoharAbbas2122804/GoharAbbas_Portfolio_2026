@@ -6,7 +6,7 @@ import { ArrowDown } from "lucide-react"
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
-export const ScrollServices = () => {
+export const ScrollFeatures = () => {
     // Array of section data
     const sections = [
         {
