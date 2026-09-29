@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Plus_Jakarta_Sans, Space_Grotesk, Syne } from "next/font/google";
@@ -27,63 +27,65 @@ const jakarta = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-const REVEAL_TEXT =
+const REVEAL_STATEMENT =
   "Stunning full-stack web systems, mobile applications, and autonomous AI models, crafted for companies that care about every detail.";
 
 export default function HeroTextRevealSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const wordsRef = useRef<(HTMLSpanElement | null)[]>([]);
+  const textContainerRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLSpanElement>(null);
-  const [revealedCount, setRevealedCount] = useState(0);
 
-  const words = REVEAL_TEXT.split(" ");
-  const totalWords = words.length;
+  const words = REVEAL_STATEMENT.split(" ");
 
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
 
     const ctx = gsap.context(() => {
+      const charEls = Array.from(section.querySelectorAll<HTMLSpanElement>(".reveal-char"));
+      const totalChars = charEls.length;
+      if (!totalChars) return;
+
+      // Single pinned ScrollTrigger that locks the section in viewport
       const st = ScrollTrigger.create({
         trigger: section,
-        start: "top 80%",
-        end: "bottom 30%",
-        scrub: 0.5,
+        start: "top top",
+        end: "+=2400", // Long scroll distance (2400px) so scroll is locked on text reveal
+        pin: true,
+        pinSpacing: true,
+        scrub: 0.6,
+        refreshPriority: 10,
         onUpdate: (self) => {
           const progress = self.progress;
-          const count = Math.floor(progress * totalWords);
-          setRevealedCount(count);
 
-          wordsRef.current.forEach((wordEl, idx) => {
-            if (!wordEl) return;
-            if (idx <= count) {
-              gsap.to(wordEl, {
-                color: "#e6e2d6",
-                opacity: 1,
-                duration: 0.2,
-                overwrite: "auto",
-              });
+          // 0.0 -> 0.82: Character-by-character letter light up from dark gray to pure white
+          // 0.82 -> 1.00: Hold / Stay buffer phase so user reads full white statement before unpinning
+          const revealProgress = Math.min(1, progress / 0.82);
+          const activeIndex = Math.floor(revealProgress * totalChars);
+
+          for (let idx = 0; idx < totalChars; idx++) {
+            const charEl = charEls[idx];
+            if (!charEl) continue;
+            if (idx <= activeIndex && revealProgress > 0) {
+              charEl.style.color = "#ffffff";
+              charEl.style.opacity = "1";
             } else {
-              gsap.to(wordEl, {
-                color: "rgba(255, 255, 255, 0.18)",
-                opacity: 0.6,
-                duration: 0.2,
-                overwrite: "auto",
-              });
+              charEl.style.color = "rgba(255, 255, 255, 0.16)";
+              charEl.style.opacity = "0.6";
             }
-          });
+          }
 
-          // Move the square cursor accent to active word position
-          const activeWord = wordsRef.current[Math.min(count, totalWords - 1)];
-          if (activeWord && cursorRef.current) {
-            const rect = activeWord.getBoundingClientRect();
-            const sectionRect = section.getBoundingClientRect();
-            const x = rect.right - sectionRect.left + 8;
-            const y = rect.top - sectionRect.top + rect.height / 2 - 8;
+          // Move the glowing cursor square accent letter-by-letter
+          const currentChar = charEls[Math.min(activeIndex, totalChars - 1)];
+          if (currentChar && cursorRef.current && textContainerRef.current) {
+            const charRect = currentChar.getBoundingClientRect();
+            const containerRect = textContainerRef.current.getBoundingClientRect();
+            const x = charRect.right - containerRect.left + 3;
+            const y = charRect.top - containerRect.top + charRect.height / 2 - 7;
             gsap.to(cursorRef.current, {
               x,
               y,
-              duration: 0.2,
+              duration: 0.12,
               ease: "power2.out",
               overwrite: "auto",
             });
@@ -94,19 +96,23 @@ export default function HeroTextRevealSection() {
       return () => st.kill();
     }, section);
 
+    if (typeof document !== "undefined" && document.fonts) {
+      document.fonts.ready.then(() => ScrollTrigger.refresh()).catch(() => undefined);
+    }
+
     return () => ctx.revert();
-  }, [totalWords]);
+  }, []);
 
   return (
     <section
       ref={sectionRef}
       aria-label="What I do statement"
-      className={`relative isolate min-h-[90vh] w-full bg-[#0b0b0c] text-white flex flex-col justify-center px-6 py-24 sm:px-12 md:px-20 ${jakarta.className}`}
+      className={`relative isolate h-screen w-full bg-[#0b0b0c] text-white flex items-center justify-center px-6 sm:px-12 md:px-20 ${jakarta.className}`}
     >
       {/* Ambient background glow */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(230,226,214,0.03),transparent_70%)]" />
 
-      <div className="mx-auto flex w-full max-w-7xl flex-col lg:flex-row lg:items-start lg:justify-between gap-12 lg:gap-16">
+      <div className="mx-auto flex w-full max-w-7xl flex-col lg:flex-row lg:items-start lg:justify-between gap-10 lg:gap-16">
         {/* Left Tag matching reference bracket [ WHAT I DO ] */}
         <div className="shrink-0 lg:w-48 pt-3">
           <span
@@ -117,29 +123,33 @@ export default function HeroTextRevealSection() {
         </div>
 
         {/* Right Large Reveal Text */}
-        <div className="relative max-w-4xl flex-1">
+        <div ref={textContainerRef} className="relative max-w-4xl flex-1">
           <p
-            className={`text-[clamp(2.2rem,min(5vw,4rem),4.2rem)] font-bold leading-[1.12] tracking-[-0.02em] select-none ${syne.className}`}
+            className={`text-[clamp(2.2rem,min(5.2vw,4rem),4.2rem)] font-bold leading-[1.14] tracking-[-0.02em] select-none ${syne.className}`}
           >
-            {words.map((word, idx) => (
-              <span
-                key={idx}
-                ref={(el) => {
-                  wordsRef.current[idx] = el;
-                }}
-                className="inline-block mr-[0.28em] transition-colors duration-200"
-                style={{ color: "rgba(255, 255, 255, 0.18)" }}
-              >
-                {word}
-              </span>
-            ))}
+            {words.map((word, wIdx) => {
+              const wordChars = word.split("");
+              return (
+                <span key={wIdx} className="inline-block whitespace-nowrap mr-[0.32em]">
+                  {wordChars.map((char, cIdx) => (
+                    <span
+                      key={cIdx}
+                      className="reveal-char inline-block transition-colors duration-150"
+                      style={{ color: "rgba(255, 255, 255, 0.16)" }}
+                    >
+                      {char}
+                    </span>
+                  ))}
+                </span>
+              );
+            })}
           </p>
 
           {/* Glowing cursor square indicator matching Marcus Lorenzet reference */}
           <span
             ref={cursorRef}
             aria-hidden="true"
-            className="pointer-events-none absolute left-0 top-0 h-3.5 w-3.5 rounded-[2px] bg-[#e6e2d6] shadow-[0_0_15px_rgba(230,226,214,0.9)] opacity-90 transition-opacity"
+            className="pointer-events-none absolute left-0 top-0 h-3.5 w-3.5 rounded-[2px] bg-[#e6e2d6] shadow-[0_0_15px_rgba(230,226,214,0.9)] opacity-95 transition-opacity"
           />
 
           {/* Subtext below statement */}
