@@ -1,35 +1,26 @@
-import About from "@/components/ui/about";
-import HeroAboutOverlay from "@/components/ui/HeroAboutOverlay";
-import Certificates from "@/components/ui/certificates";
+import dynamic from "next/dynamic";
 import { Navbar } from "@/components/ui/menu_navbar";
-import Services from "@/components/ui/services";
-import CtaSection from "@/components/ui/cta_section";
-import Footer from "@/components/ui/footer";
-import {
-  ABOUT_CONFIG,
-  ABOUT_LOCATION,
-  ABOUT_PROJECTS,
-  ABOUT_SOCIAL_LINKS,
-} from "@/lib/constants";
-import { ScrollFeatures } from "@/components/ui/ScrollServices";
-import Timeline from "@/components/ui/timeline";
-import { StaggerTestimonials } from "@/components/ui/testimonials";
-import WorksWheel, { DEFAULT_PROJECT_ITEMS } from "@/components/ui/work2026";
-import LatestServices from "@/components/ui/LatestServices";
+import HeroAboutOverlay from "@/components/ui/HeroAboutOverlay";
+import { DEFAULT_PROJECT_ITEMS } from "@/components/ui/work2026";
+
+// Below-the-fold sections loaded dynamically with matching BACKGROUND_CHUNKS in preloader.tsx
+const Timeline = dynamic(() => import("@/components/ui/timeline"));
+const Services = dynamic(() => import("@/components/ui/services"));
+const WorksWheel = dynamic(() => import("@/components/ui/work2026"));
+const Certificates = dynamic(() => import("@/components/ui/certificates"));
+const LatestServices = dynamic(() => import("@/components/ui/LatestServices"));
+const StaggerTestimonials = dynamic(() =>
+  import("@/components/ui/testimonials").then((mod) => ({ default: mod.StaggerTestimonials }))
+);
+const CtaSection = dynamic(() => import("@/components/ui/cta_section"));
+const Footer = dynamic(() => import("@/components/ui/footer"));
 
 export default function Home() {
   return (
     <main className="flex-1 relative bg-[#0b0b0c] min-h-screen text-white overflow-x-hidden">
       <Navbar />
       <HeroAboutOverlay />
-      {/* <About
-        projects={ABOUT_PROJECTS}
-        config={ABOUT_CONFIG}
-        socialLinks={ABOUT_SOCIAL_LINKS}
-        location={ABOUT_LOCATION}
-      /> */}
       <Timeline />
-      <ScrollFeatures />
       <Services />
       <WorksWheel
         label="Works '26"
@@ -45,6 +36,3 @@ export default function Home() {
     </main>
   );
 }
-
-
-

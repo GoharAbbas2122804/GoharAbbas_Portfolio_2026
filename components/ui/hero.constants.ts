@@ -7,7 +7,7 @@ import portrait from "@/app/assets/Images/portfolioProfile.jpeg";
 // ---------------------------------------------------------------------------
 export const playfair = Playfair_Display({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400", "500", "600", "700", "800", "900"],
   fallback: ["Bodoni Moda", "Georgia"],
   display: "swap",
 });

@@ -97,9 +97,9 @@ export const ABOUT_CONFIG: AboutConfig = {
 };
 
 export const ABOUT_SOCIAL_LINKS: SocialLinks = {
-  spotify: "https://spotify.com/your-profile",
-  email: "mailto:your-email@example.com",
-  x: "https://x.com/your-handle",
+  spotify: "https://github.com/GoharAbbas2122804/",
+  email: "mailto:GoharAbbas2122804@gmail.com",
+  x: "https://www.linkedin.com/in/gohar-abbas-106519321/",
 };
 
 export const ABOUT_LOCATION: LocationInfo = {

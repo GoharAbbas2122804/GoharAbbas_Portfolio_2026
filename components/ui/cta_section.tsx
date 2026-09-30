@@ -246,6 +246,7 @@ export default function CtaSection({
   return (
     <section
       ref={containerRef}
+      id="connect"
       className={`w-full bg-[#141416] border-y border-white/10 text-white overflow-hidden py-4 sm:py-8 ${className}`}
       aria-label="Call to Action"
     >

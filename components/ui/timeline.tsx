@@ -41,76 +41,52 @@ export interface JourneyMilestone {
 
 const MILESTONES: JourneyMilestone[] = [
   {
-    id: "m1-2020",
-    year: "2020",
-    period: "Q1 - 2020",
-    title: "CS Foundation & First Code",
-    role: "Self-Taught Developer",
-    description:
-      "Dived deep into computer science fundamentals, HTML, CSS, JavaScript, and algorithms. Built first interactive web applications.",
-    skills: ["JavaScript", "HTML/CSS", "Git", "UI Design"],
-    category: "top",
-    icon: "🌱",
-  },
-  {
-    id: "m2-2021",
-    year: "2021",
-    period: "Q3 - 2021",
-    title: "Freelance & Client Systems",
-    role: "Frontend Developer",
-    description:
-      "Started delivering bespoke web platforms for clients worldwide, mastering React, component architecture, and responsive design.",
-    skills: ["React", "Tailwind CSS", "REST APIs", "Figma"],
-    category: "bottom",
-    icon: "🚀",
-  },
-  {
-    id: "m3-2023",
+    id: "m1-2023",
     year: "2023",
-    period: "Q2 - 2023",
-    title: "Full-Stack Mastery & Next.js",
-    role: "Full-Stack Engineer",
+    period: "2023",
+    title: "CS Foundations & Core Engineering",
+    role: "Computer Science Foundations",
     description:
-      "Architected serverless web apps with Next.js App Router, SSR/SSG, database optimization, and high-concurrency Node.js backends.",
-    skills: ["Next.js", "TypeScript", "Node.js", "PostgreSQL"],
+      "Initiated Computer Science journey mastering programming paradigms, data structures, algorithms, object-oriented design, version control, and operating systems.",
+    skills: ["Computer Science", "Data Structures", "Algorithms", "C / C++", "Git & Linux"],
     category: "top",
+    icon: "💻",
+  },
+  {
+    id: "m2-2024",
+    year: "2024",
+    period: "2024",
+    title: "Full-Stack Web Systems",
+    role: "Full-Stack Web Engineer",
+    description:
+      "Mastered modern full-stack web architecture—building responsive web applications, SSR/SSG systems, REST/GraphQL APIs, Next.js, React, Node.js, and relational databases.",
+    skills: ["Full-Stack Web", "Next.js", "React", "TypeScript", "Node.js", "PostgreSQL"],
+    category: "bottom",
     icon: "⚡",
   },
   {
-    id: "m4-2024",
-    year: "2024",
-    period: "Q1 - 2024",
-    title: "Mobile App Development",
-    role: "Mobile Architect",
+    id: "m3-2025",
+    year: "2025",
+    period: "2025",
+    title: "Flutter & Mobile Development",
+    role: "Mobile Application Architect",
     description:
-      "Expanded ecosystem into cross-platform mobile apps, building seamless offline-first mobile user experiences and native plugins.",
-    skills: ["React Native", "Expo", "Mobile UI", "State Sync"],
-    category: "bottom",
+      "Expanded ecosystem into mobile development—architecting high-performance cross-platform Flutter apps and native iOS & Android solutions with offline sync and native API bindings.",
+    skills: ["Flutter", "Dart", "iOS & Android", "Native Mobile", "State Sync"],
+    category: "top",
     icon: "📱",
   },
   {
-    id: "m5-2025",
-    year: "2025",
-    period: "Q3 - 2025",
-    title: "Motion, GSAP & WebGL",
-    role: "Creative Technologist",
-    description:
-      "Integrated high-performance GSAP animations, 3D Canvas scenes with Three.js, micro-interactions, and Awwwards-level polish.",
-    skills: ["GSAP", "Three.js", "WebGL", "Framer Motion"],
-    category: "top",
-    icon: "🔮",
-  },
-  {
-    id: "m6-2026",
+    id: "m4-2026",
     year: "2026",
     period: "Present - 2026",
-    title: "Enterprise Solutions & Beyond",
-    role: "Lead Systems Architect",
+    title: "AI, Deep Learning & RAG Systems",
+    role: "AI / ML Systems Engineer",
     description:
-      "Building cutting-edge Web3 & AI-powered web applications, high-throughput digital products, and high-impact design systems.",
-    skills: ["AI Engineering", "Scalable Systems", "Performance", "UI Architecture"],
+      "Specialized in modern AI & Deep Learning—building Transformer models, Retrieval-Augmented Generation (RAG) knowledge pipelines, PyTorch neural nets, and autonomous AI agents.",
+    skills: ["Deep Learning", "Transformers", "RAG Pipelines", "AI Agents", "PyTorch", "LLMs"],
     category: "bottom",
-    icon: "🏆",
+    icon: "🧠",
   },
 ];
 
@@ -199,7 +175,7 @@ export default function Timeline() {
         <div className="flex items-center gap-3">
           <span className="h-2.5 w-2.5 rounded-full bg-white animate-pulse shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
           <span className={`text-xs font-bold uppercase tracking-[0.25em] text-zinc-300 ${spaceGrotesk.className}`}>
-            MY JOURNEY — 2020 TO 2026
+            MY JOURNEY — 2023 TO 2026
           </span>
         </div>
         <span className={`text-xs font-bold uppercase tracking-[0.2em] text-zinc-500 ${spaceGrotesk.className}`}>
@@ -226,7 +202,7 @@ export default function Timeline() {
               </span>
             </h2>
             <p className="text-sm md:text-base text-zinc-400 leading-relaxed font-normal">
-              From writing my first line of code in 2020 to architecting full-stack web applications, mobile platforms, and high-performance digital experiences.
+              From Computer Science foundations in 2023 to full-stack web platforms, mobile Flutter apps, and cutting-edge Deep Learning &amp; RAG systems in 2026.
             </p>
             <div className={`pt-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 ${spaceGrotesk.className}`}>
               <span>Scroll horizontally to view milestones</span>

@@ -605,6 +605,7 @@ export default function Services({
   return (
     <div
       ref={rootRef}
+      id="services"
       style={{ backgroundColor }}
       className={`parallax-strip-slider relative h-full w-full overflow-hidden ${className}`}
     >

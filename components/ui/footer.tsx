@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Mail, Phone } from "lucide-react";
 import { useRef } from "react";
 
 /* ---------------- Social Icon SVG Components ---------------- */
@@ -112,10 +112,10 @@ export const WordsPullUpMultiStyle = ({ segments, className = "", style }: Words
 
 /* ---------------- Social Links ---------------- */
 const socialLinks = [
-  { name: "Threads", icon: ThreadsIcon, href: "#" },
-  { name: "Instagram", icon: InstagramIcon, href: "#" },
-  { name: "LinkedIn", icon: LinkedinIcon, href: "#" },
-  { name: "GitHub", icon: GithubIcon, href: "#" },
+  { name: "LinkedIn", icon: LinkedinIcon, href: "https://www.linkedin.com/in/gohar-abbas-106519321/" },
+  { name: "GitHub", icon: GithubIcon, href: "https://github.com/GoharAbbas2122804/" },
+  { name: "Threads", icon: ThreadsIcon, href: "https://www.threads.com/@goharabbas2122804" },
+  { name: "Instagram", icon: InstagramIcon, href: "https://www.instagram.com/goharabbas2122804/" },
 ];
 
 /* ---------------- Footer Component ---------------- */
@@ -189,7 +189,31 @@ export default function Footer() {
               Gohar is a full-stack engineer and creative developer passionate about building high-impact digital experiences and modern web applications.
             </motion.p>
 
-            <motion.button
+            {/* Direct Contact Pills (Email & Phone) */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-col sm:flex-row flex-wrap gap-3"
+            >
+              <a
+                href="mailto:GoharAbbas2122804@gmail.com"
+                className="inline-flex items-center gap-2.5 text-xs sm:text-sm font-medium text-[#E1E0CC] bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full border border-white/15 transition-all shadow-md backdrop-blur-sm"
+              >
+                <Mail className="h-4 w-4 text-[#E1E0CC]" />
+                <span>GoharAbbas2122804@gmail.com</span>
+              </a>
+              <a
+                href="tel:+923344290186"
+                className="inline-flex items-center gap-2.5 text-xs sm:text-sm font-medium text-[#E1E0CC] bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full border border-white/15 transition-all shadow-md backdrop-blur-sm"
+              >
+                <Phone className="h-4 w-4 text-[#E1E0CC]" />
+                <span>+92 334 4290186</span>
+              </a>
+            </motion.div>
+
+            <motion.a
+              href="mailto:GoharAbbas2122804@gmail.com"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
@@ -199,7 +223,7 @@ export default function Footer() {
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-black transition-transform group-hover:scale-110 sm:h-10 sm:w-10">
                 <ArrowRight className="h-4 w-4" style={{ color: "#E1E0CC" }} />
               </span>
-            </motion.button>
+            </motion.a>
 
           </div>
         </div>

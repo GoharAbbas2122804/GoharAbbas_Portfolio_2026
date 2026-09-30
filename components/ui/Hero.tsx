@@ -12,6 +12,7 @@ import {
   playfair,
   spaceGrotesk,
 } from "./hero.constants";
+import { usePreloaderDone } from "@/components/preloader";
 
 // ---------------------------------------------------------------------------
 // Canvas rectangle field types
@@ -62,34 +63,109 @@ function useTransparentPortrait(src: string) {
         const imageData = ctx.getImageData(0, 0, w, h);
         const data = imageData.data;
 
-        // Sample background color near corners (top-left & top-right)
+        // Sample background color near corners (top-left)
         const bgR = data[0];
         const bgG = data[1];
         const bgB = data[2];
 
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i];
-          const g = data[i + 1];
-          const b = data[i + 2];
+        // Connected flood-fill starting strictly from the outer boundaries.
+        // This ensures external background is made transparent while protected
+        // internal facial highlights (such as specular reflections on the nose)
+        // are NEVER reached or made transparent.
+        const totalPixels = w * h;
+        const visited = new Uint8Array(totalPixels);
+        const queue = new Int32Array(totalPixels);
+        let head = 0;
+        let tail = 0;
 
-          // Calculate color distance from sampled background corner
-          const colorDist = Math.sqrt(
-            (r - bgR) * (r - bgR) +
-            (g - bgG) * (g - bgG) +
-            (b - bgB) * (b - bgB)
-          );
+        const isBgPixel = (idx: number) => {
+          const pi = idx * 4;
+          const r = data[pi];
+          const g = data[pi + 1];
+          const b = data[pi + 2];
+          const dr = r - bgR;
+          const dg = g - bgG;
+          const db = b - bgB;
+          const colorDist = Math.sqrt(dr * dr + dg * dg + db * db);
+          return colorDist < 46 || (r > 218 && g > 218 && b > 218);
+        };
 
-          // Near white / light paper background threshold check
-          const isWhiteBackground = r > 218 && g > 218 && b > 218;
+        // Seed all outer border pixels
+        for (let x = 0; x < w; x++) {
+          const topIdx = x;
+          const btmIdx = (h - 1) * w + x;
+          if (!visited[topIdx] && isBgPixel(topIdx)) {
+            visited[topIdx] = 1;
+            queue[tail++] = topIdx;
+          }
+          if (!visited[btmIdx] && isBgPixel(btmIdx)) {
+            visited[btmIdx] = 1;
+            queue[tail++] = btmIdx;
+          }
+        }
+        for (let y = 0; y < h; y++) {
+          const lIdx = y * w;
+          const rIdx = y * w + (w - 1);
+          if (!visited[lIdx] && isBgPixel(lIdx)) {
+            visited[lIdx] = 1;
+            queue[tail++] = lIdx;
+          }
+          if (!visited[rIdx] && isBgPixel(rIdx)) {
+            visited[rIdx] = 1;
+            queue[tail++] = rIdx;
+          }
+        }
 
-          if (colorDist < 45 || isWhiteBackground) {
+        // Breadth-first search along connected background only
+        while (head < tail) {
+          const idx = queue[head++];
+          const cx = idx % w;
+          const cy = (idx / w) | 0;
+
+          if (cx > 0) {
+            const left = idx - 1;
+            if (!visited[left] && isBgPixel(left)) {
+              visited[left] = 1;
+              queue[tail++] = left;
+            }
+          }
+          if (cx < w - 1) {
+            const right = idx + 1;
+            if (!visited[right] && isBgPixel(right)) {
+              visited[right] = 1;
+              queue[tail++] = right;
+            }
+          }
+          if (cy > 0) {
+            const up = idx - w;
+            if (!visited[up] && isBgPixel(up)) {
+              visited[up] = 1;
+              queue[tail++] = up;
+            }
+          }
+          if (cy < h - 1) {
+            const down = idx + w;
+            if (!visited[down] && isBgPixel(down)) {
+              visited[down] = 1;
+              queue[tail++] = down;
+            }
+          }
+        }
+
+        // Apply transparency strictly to visited connected background pixels
+        for (let idx = 0; idx < totalPixels; idx++) {
+          if (visited[idx] === 1) {
+            const pi = idx * 4;
+            const r = data[pi];
+            const g = data[pi + 1];
+            const b = data[pi + 2];
             const avgLightness = (r + g + b) / 3;
             if (avgLightness > 235) {
-              data[i + 3] = 0; // Completely transparent
+              data[pi + 3] = 0; // Completely transparent
             } else {
               // Smooth edge anti-aliasing / feathering
               const alphaRatio = Math.max(0, (235 - avgLightness) / 20);
-              data[i + 3] = Math.floor(alphaRatio * 255);
+              data[pi + 3] = Math.floor(alphaRatio * 255);
             }
           }
         }
@@ -139,7 +215,17 @@ export default function Hero({
   // Automatically remove white background rectangle to turn image into a seamless cutout
   const transparentPortraitSrc = useTransparentPortrait(portrait.src);
 
+  const nameParts = name.trim().split(/\s+/);
+  const firstName = nameParts[0] || "GOHAR";
+  const lastName = nameParts.slice(1).join(" ") || "ABBAS";
+
+  const isPreloaderDone = usePreloaderDone();
+
   useLayoutEffect(() => {
+    if (!isPreloaderDone) {
+      return;
+    }
+
     const root = rootRef.current;
     const canvas = canvasRef.current;
     const portraitLayer = portraitParallaxRef.current;
@@ -260,12 +346,17 @@ export default function Hero({
 
       // 1. GSAP Right-to-Left 100% Mathematically Seamless Infinite Loop (Behind Portrait)
       if (nameTrack) {
-        gsap.to(nameTrack, {
-          xPercent: -33.33333333333333,
-          repeat: -1,
-          duration: 7,
-          ease: "none",
-        });
+        gsap.fromTo(
+          nameTrack,
+          { xPercent: 0 },
+          {
+            xPercent: -50,
+            repeat: -1,
+            duration: 24,
+            ease: "none",
+            force3D: true,
+          }
+        );
       }
 
       // 2. GSAP Infinite Right-to-Left Marquee for Bottom Bar
@@ -338,7 +429,7 @@ export default function Hero({
       removeMove?.();
       ctx.revert();
     };
-  }, []);
+  }, [isPreloaderDone]);
 
   const marqueeItems = [
     "✦ GOHAR ABBAS",
@@ -357,7 +448,7 @@ export default function Hero({
       className={`relative h-svh w-full overflow-hidden bg-[#f4f1ea] text-black ${className}`}
     >
       {/* L0 — Top Detailing Header Badge */}
-      <div className="absolute top-10 sm:top-12 inset-x-0 z-30 flex flex-col items-center justify-center pointer-events-none px-4">
+      <div data-hero-reveal className="hidden md:flex absolute top-10 sm:top-12 inset-x-0 z-30 flex-col items-center justify-center pointer-events-none px-4">
         <div className={`flex items-center gap-2.5 sm:gap-3 text-[11px] sm:text-xs md:text-sm font-bold uppercase tracking-[0.25em] text-black/85 bg-[#f4f1ea]/90 backdrop-blur-md px-6 py-2.5 rounded-full border border-black/10 shadow-md ${spaceGrotesk.className}`}>
           <span>FULL-STACK WEB DEV</span>
           <span className="text-black/35">•</span>
@@ -365,71 +456,66 @@ export default function Hero({
         </div>
       </div>
 
-      {/* L1 — Separated GOHAR (left) and ABBAS (right) Moving Right to Left BEHIND the Portrait Cutout */}
-      <div className="absolute top-[18vh] sm:top-[14vh] md:top-[12vh] inset-x-0 z-10 overflow-hidden pointer-events-none select-none">
+      {/* L1 — Name & Title Moving Right to Left BEHIND the Portrait Cutout (Centered vertically in hero section) */}
+      <div data-hero-reveal className="absolute top-1/2 -translate-y-1/2 inset-x-0 z-10 overflow-hidden pointer-events-none select-none">
         <div
           ref={nameTrackRef}
           className="flex whitespace-nowrap will-change-transform"
         >
-          {/* Set 1 */}
-          <div className="flex items-center gap-[20vw] pr-[20vw] shrink-0">
-            <span className={`${playfair.className} text-[clamp(4.5rem,14vw,14rem)] font-black tracking-[-0.04em] uppercase text-black/90 leading-none drop-shadow-sm`}>
-              GOHAR
-            </span>
-            <span className={`${playfair.className} text-[clamp(4.5rem,14vw,14rem)] font-black tracking-[-0.04em] uppercase text-black/90 leading-none drop-shadow-sm`}>
-              ABBAS
-            </span>
+          {/* Group 1: GOHAR ABBAS SOFTWARE ENGINEER */}
+          <div className="flex items-center shrink-0 gap-6 sm:gap-10 md:gap-16 lg:gap-24 pr-6 sm:pr-10 md:pr-16 lg:pr-24">
+            {["GOHAR", "ABBAS", "SOFTWARE", "ENGINEER"].map((word, i) => (
+              <span
+                key={`hw1-${i}`}
+                className={`${playfair.className} text-[clamp(3.5rem,10vw,12.5rem)] font-black tracking-[-0.03em] uppercase text-black/90 leading-none drop-shadow-sm`}
+              >
+                {word}
+              </span>
+            ))}
           </div>
 
-          {/* Set 2 */}
-          <div className="flex items-center gap-[20vw] pr-[20vw] shrink-0" aria-hidden="true">
-            <span className={`${playfair.className} text-[clamp(4.5rem,14vw,14rem)] font-black tracking-[-0.04em] uppercase text-black/90 leading-none drop-shadow-sm`}>
-              GOHAR
-            </span>
-            <span className={`${playfair.className} text-[clamp(4.5rem,14vw,14rem)] font-black tracking-[-0.04em] uppercase text-black/90 leading-none drop-shadow-sm`}>
-              ABBAS
-            </span>
-          </div>
-
-          {/* Set 3 */}
-          <div className="flex items-center gap-[20vw] pr-[20vw] shrink-0" aria-hidden="true">
-            <span className={`${playfair.className} text-[clamp(4.5rem,14vw,14rem)] font-black tracking-[-0.04em] uppercase text-black/90 leading-none drop-shadow-sm`}>
-              GOHAR
-            </span>
-            <span className={`${playfair.className} text-[clamp(4.5rem,14vw,14rem)] font-black tracking-[-0.04em] uppercase text-black/90 leading-none drop-shadow-sm`}>
-              ABBAS
-            </span>
+          {/* Group 2: Exact identical duplicate for 100% seamless -50% loop */}
+          <div className="flex items-center shrink-0 gap-6 sm:gap-10 md:gap-16 lg:gap-24 pr-6 sm:pr-10 md:pr-16 lg:pr-24" aria-hidden="true">
+            {["GOHAR", "ABBAS", "SOFTWARE", "ENGINEER"].map((word, i) => (
+              <span
+                key={`hw2-${i}`}
+                className={`${playfair.className} text-[clamp(3.5rem,10vw,12.5rem)] font-black tracking-[-0.03em] uppercase text-black/90 leading-none drop-shadow-sm`}
+              >
+                {word}
+              </span>
+            ))}
           </div>
         </div>
       </div>
 
       {/* L2 — Seamless Transparent Portrait Cutout (Positioned IN FRONT of the scrolling name) */}
       <div
+        data-hero-reveal
         ref={portraitParallaxRef}
-        className="absolute inset-0 z-20 h-full w-full flex items-end justify-center pt-24 pb-12 sm:pb-14 px-6 pointer-events-none will-change-transform"
+        className="absolute inset-0 z-20 h-full w-full flex items-end justify-center pb-12 sm:pb-14 px-4 sm:px-6 pointer-events-none will-change-transform"
       >
         <div
           ref={portraitRevealRef}
-          className="relative h-[56vh] sm:h-[64vh] md:h-[72vh] w-auto max-w-[90vw] flex items-end justify-center origin-bottom will-change-transform"
+          className="relative h-[50vh] sm:h-[58vh] md:h-[66vh] lg:h-[74vh] max-h-[780px] w-auto max-w-[92vw] sm:max-w-[85vw] md:max-w-[75vw] lg:max-w-[900px] flex items-end justify-center origin-bottom will-change-transform"
         >
           <img
             src={transparentPortraitSrc}
             alt="Gohar Abbas"
             draggable={false}
-            className="block h-full w-auto max-w-full object-contain select-none filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.15)] [mask-image:linear-gradient(to_bottom,black_94%,transparent_100%)]"
+            className="block h-full w-auto max-w-full object-contain object-bottom select-none filter drop-shadow-[0_16px_32px_rgba(0,0,0,0.18)] [mask-image:linear-gradient(to_bottom,black_92%,transparent_100%)]"
           />
         </div>
       </div>
 
       {/* L3 — Background Animation: Blueprint grid & floating canvas geometries float BEHIND */}
-      <div className="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
+      <div data-hero-reveal className="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
         <div className="absolute inset-0 bg-[repeating-linear-gradient(to_right,rgba(0,0,0,0.05)_0px,rgba(0,0,0,0.05)_1px,transparent_1px,transparent_40px)]" />
         <div className="absolute inset-0 bg-[repeating-linear-gradient(to_bottom,rgba(0,0,0,0.05)_0px,rgba(0,0,0,0.05)_1px,transparent_1px,transparent_40px)]" />
         <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full" />
       </div>
 
       {/* L4 — Infinite GSAP Marquee Text Bar Moving Right to Left Below the Image */}
-      <div className={`absolute bottom-12 sm:bottom-14 inset-x-0 z-30 overflow-hidden bg-black text-white py-2.5 sm:py-3 shadow-2xl select-none ${spaceGrotesk.className}`}>
+      <div data-hero-reveal className={`absolute bottom-12 sm:bottom-14 inset-x-0 z-30 overflow-hidden bg-black text-white py-2.5 sm:py-3 shadow-2xl select-none ${spaceGrotesk.className}`}>
         <div
           ref={marqueeTrackRef}
           className="flex whitespace-nowrap will-change-transform text-xs sm:text-sm font-bold tracking-[0.25em] uppercase"
@@ -453,7 +539,7 @@ export default function Hero({
       </div>
 
       {/* L5 — Chrome & Micro-labels */}
-      <div className={`absolute inset-0 z-30 pointer-events-none ${spaceGrotesk.className}`}>
+      <div data-hero-reveal className={`absolute inset-0 z-30 pointer-events-none ${spaceGrotesk.className}`}>
         <div className="absolute bottom-3 left-6 flex items-center gap-3 sm:bottom-3 sm:left-10">
           <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black">
             {scrollLabel}

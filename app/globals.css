@@ -132,6 +132,18 @@
   }
 }
 
+/* Gate hero entrance until preloader curtain starts lifting (or returning visitor in same session) */
+@keyframes pl-failsafe {
+  to {
+    visibility: visible;
+  }
+}
+
+html:not([data-pl-done]) [data-hero-reveal] {
+  visibility: hidden;
+  animation: pl-failsafe 0s 12s forwards;
+}
+
 /* About section (components/ui/about.tsx) */
 .about-section {
   position: relative;
@@ -271,17 +283,19 @@
 .site-header-wrapper {
   position: fixed;
   top: 1.5rem;
-  right: 1.75rem;
+  left: 1.25rem;
+  right: 1.25rem;
   z-index: 120;
   pointer-events: none;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
 }
 
 @media (min-width: 640px) {
   .site-header-wrapper {
     top: 2rem;
+    left: 2rem;
     right: 2.5rem;
   }
 }
@@ -289,6 +303,7 @@
 @media (min-width: 1024px) {
   .site-header-wrapper {
     top: 2.25rem;
+    left: 2.5rem;
     right: 3rem;
   }
 }
@@ -325,11 +340,45 @@
   transform: translateY(-1px);
 }
 
-.nav-close-btn {
-  display: flex;
+.nav-logo-btn {
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  height: 38px;
+  padding: 0 1rem;
+  border-radius: 9999px;
+  background: #1a1a22;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-family: inherit;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.25s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  user-select: none;
+}
+
+@media (min-width: 640px) {
+  .nav-logo-btn {
+    height: 40px;
+    padding: 0 1.15rem;
+  }
+}
+
+.nav-logo-btn:hover {
+  background: #23232c;
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  transform: scale(1.03);
+}
+
+.nav-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
   gap: 0.6rem;
-  padding: 0.55rem 1.1rem;
+  padding: 0 1.1rem;
   border-radius: 9999px;
   background: #1a1a22;
   color: #ffffff;
@@ -343,6 +392,12 @@
   overflow: hidden;
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.25s ease;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+@media (min-width: 640px) {
+  .nav-close-btn {
+    height: 40px;
+  }
 }
 
 .nav-close-btn.is-open {

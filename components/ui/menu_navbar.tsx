@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { CustomEase } from "gsap/CustomEase";
+import { Logo } from "@/components/ui/Logo";
 
 // Register GSAP Plugins safely
 if (typeof window !== "undefined") {
@@ -189,9 +190,59 @@ export function Navbar() {
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
   const closeMenu = () => setIsMenuOpen(false);
 
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
+    closeMenu();
+
+    const targetElem = document.getElementById(targetId);
+    if (!targetElem) return;
+
+    const targetY = targetElem.getBoundingClientRect().top + window.scrollY;
+    const scrollObj = { y: window.scrollY };
+
+    gsap.to(scrollObj, {
+      y: targetY,
+      duration: 1.2,
+      ease: "power3.inOut",
+      onUpdate: () => {
+        window.scrollTo(0, scrollObj.y);
+      },
+      onComplete: () => {
+        if (typeof window !== "undefined" && (window as any).gsap?.plugins?.ScrollTrigger) {
+          (window as any).gsap.plugins.ScrollTrigger.refresh();
+        }
+      },
+    });
+  };
+
+  const handleLogoClick = () => {
+    if (isMenuOpen) closeMenu();
+
+    const scrollObj = { y: window.scrollY };
+    gsap.to(scrollObj, {
+      y: 0,
+      duration: 1.2,
+      ease: "power3.inOut",
+      onUpdate: () => {
+        window.scrollTo(0, scrollObj.y);
+      },
+      onComplete: () => {
+        if (typeof window !== "undefined" && (window as any).gsap?.plugins?.ScrollTrigger) {
+          (window as any).gsap.plugins.ScrollTrigger.refresh();
+        }
+      },
+    });
+  };
+
   return (
     <div ref={containerRef}>
-      <div className="site-header-wrapper">
+      <header className="site-header-wrapper">
+        <Logo
+          isVisible={isVisible}
+          isMenuOpen={isMenuOpen}
+          onClick={handleLogoClick}
+        />
+
         <button
           role="button"
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
@@ -226,7 +277,7 @@ export function Navbar() {
             </svg>
           </div>
         </button>
-      </div>
+      </header>
 
       <section className="fullscreen-menu-container">
         <div data-nav="closed" className="nav-overlay-wrapper">
@@ -304,26 +355,32 @@ export function Navbar() {
             <div className="menu-content-wrapper">
               <ul className="menu-list">
                 <li className="menu-list-item" data-shape="1">
-                  <a href="#about" onClick={closeMenu} className="nav-link w-inline-block">
-                    <p className="nav-link-text">About</p>
+                  <a href="#hero" onClick={(e) => handleNavClick(e, "hero")} className="nav-link w-inline-block">
+                    <p className="nav-link-text">Hero</p>
                     <div className="nav-link-hover-bg"></div>
                   </a>
                 </li>
                 <li className="menu-list-item" data-shape="2">
-                  <a href="#services" onClick={closeMenu} className="nav-link w-inline-block">
-                    <p className="nav-link-text">Services</p>
+                  <a href="#about" onClick={(e) => handleNavClick(e, "about")} className="nav-link w-inline-block">
+                    <p className="nav-link-text">About</p>
                     <div className="nav-link-hover-bg"></div>
                   </a>
                 </li>
                 <li className="menu-list-item" data-shape="3">
-                  <a href="#certificates" onClick={closeMenu} className="nav-link w-inline-block">
-                    <p className="nav-link-text">Certificates</p>
+                  <a href="#work" onClick={(e) => handleNavClick(e, "work")} className="nav-link w-inline-block">
+                    <p className="nav-link-text">Work</p>
                     <div className="nav-link-hover-bg"></div>
                   </a>
                 </li>
                 <li className="menu-list-item" data-shape="4">
-                  <a href="#contact" onClick={closeMenu} className="nav-link w-inline-block">
-                    <p className="nav-link-text">Contact</p>
+                  <a href="#services" onClick={(e) => handleNavClick(e, "services")} className="nav-link w-inline-block">
+                    <p className="nav-link-text">Services</p>
+                    <div className="nav-link-hover-bg"></div>
+                  </a>
+                </li>
+                <li className="menu-list-item" data-shape="5">
+                  <a href="#connect" onClick={(e) => handleNavClick(e, "connect")} className="nav-link w-inline-block">
+                    <p className="nav-link-text">Connect</p>
                     <div className="nav-link-hover-bg"></div>
                   </a>
                 </li>
