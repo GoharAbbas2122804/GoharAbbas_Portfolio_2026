@@ -1,0 +1,7 @@
+.git
+.github
+.gemini
+CLAUDE.md
+AGENTS.md
+*.log
+.DS_Store
