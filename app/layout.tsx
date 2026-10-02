@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono, Manrope, Oswald, Space_Grotesk } from "next/font/google";
 import Preloader from "@/components/preloader";
 
-const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
+const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-code" });
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space" });
+const manrope = Manrope({ subsets: ["latin"], variable: "--font-body" });
+const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald", weight: ["400", "500", "600", "700"] });
 
 export const metadata: Metadata = {
   title: "Gohar Abbas | Portfolio 2026",
@@ -16,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("h-full", "antialiased", "font-mono", jetbrainsMono.variable)}
+      className={cn("h-full", "antialiased", jetbrainsMono.variable, spaceGrotesk.variable, manrope.variable, oswald.variable)}
     >
       <head>
         <script

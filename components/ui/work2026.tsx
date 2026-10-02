@@ -331,13 +331,15 @@ export function WorksWheel({
         role="listbox"
         aria-label={label}
         aria-activedescendant={`works-wheel-${active}`}
-        className="focus-visible:outline-emerald-500 absolute inset-0 cursor-grab touch-pan-x outline-none focus-visible:outline-2 focus-visible:-outline-offset-4 active:cursor-grabbing"
+        className="focus-visible:outline-emerald-500 absolute inset-0 cursor-grab touch-pan-y outline-none focus-visible:outline-2 focus-visible:-outline-offset-4 active:cursor-grabbing"
         style={{ perspective: `${metrics.depth}px` }}
         onPointerDown={(event) => {
+          if (event.pointerType === "touch") return;
           dragStart.current = { y: event.clientY, moved: false };
           event.currentTarget.setPointerCapture(event.pointerId);
         }}
         onPointerMove={(event) => {
+          if (event.pointerType === "touch") return;
           if (dragStart.current.y === 0 && !dragStart.current.moved) return;
           const delta = dragStart.current.y - event.clientY;
           if (Math.abs(delta) > 5) {
@@ -511,4 +513,3 @@ export function WorksWheel({
 }
 
 export default WorksWheel;
-

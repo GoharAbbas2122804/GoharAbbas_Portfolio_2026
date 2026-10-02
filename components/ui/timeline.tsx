@@ -309,7 +309,7 @@ export default function Timeline() {
               Always expanding my stack, crafting bold user interfaces, and solving complex architecture problems.
             </p>
             <a
-              href="#contact"
+              href="/contact"
               className={`inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#0b0b0c] bg-white hover:bg-zinc-200 px-5 py-2.5 rounded-full transition-all duration-300 shadow-lg ${spaceGrotesk.className}`}
             >
               Build With Me

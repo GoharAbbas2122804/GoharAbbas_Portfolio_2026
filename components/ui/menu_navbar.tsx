@@ -379,7 +379,7 @@ export function Navbar() {
                   </a>
                 </li>
                 <li className="menu-list-item" data-shape="5">
-                  <a href="#connect" onClick={(e) => handleNavClick(e, "connect")} className="nav-link w-inline-block">
+                  <a href="/contact" className="nav-link w-inline-block">
                     <p className="nav-link-text">Connect</p>
                     <div className="nav-link-hover-bg"></div>
                   </a>

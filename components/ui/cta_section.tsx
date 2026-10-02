@@ -37,9 +37,9 @@ export default function CtaSection({
   subtitle = "Build, improve, & grow.",
   priceTag = "Starting at $5995.",
   primaryCtaText = "Get started",
-  primaryCtaLink = "#contact",
+  primaryCtaLink = "/contact",
   secondaryCtaText = "Book a call",
-  secondaryCtaLink = "#book",
+  secondaryCtaLink = "/contact",
   features = [
     {
       icon: <Sparkle className="w-4 h-4 text-white shrink-0" weight="fill" />,

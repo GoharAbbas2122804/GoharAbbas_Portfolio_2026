@@ -213,7 +213,7 @@ export default function Footer() {
             </motion.div>
 
             <motion.a
-              href="mailto:GoharAbbas2122804@gmail.com"
+              href="/contact"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
