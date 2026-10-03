@@ -37,7 +37,7 @@ export default function PreviewTestimonials() {
   }, []);
 
   return (
-    <main className="relative min-h-screen bg-[#0b0b0c]">
+    <main id="main-content" tabIndex={-1} className="relative min-h-screen bg-[#0b0b0c]">
       <style>{`nextjs-portal{display:none!important}`}</style>
       <StaggerTestimonials />
       <pre

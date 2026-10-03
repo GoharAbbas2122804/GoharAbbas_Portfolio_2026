@@ -94,7 +94,7 @@ export default function ContactPage() {
   };
 
   return (
-    <main ref={pageRef} className="relative min-h-screen overflow-hidden bg-[#f3ede4] px-5 py-7 text-[#122315] sm:px-8 lg:px-12">
+    <main id="main-content" ref={pageRef} tabIndex={-1} className="relative min-h-screen overflow-hidden bg-[#f3ede4] px-5 py-7 text-[#122315] sm:px-8 lg:px-12">
       <Navbar />
       <div className="pointer-events-none absolute -right-44 top-12 size-[30rem] rounded-full bg-[#55dd4a]/[0.08] blur-[130px]" />
 

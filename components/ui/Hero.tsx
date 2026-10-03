@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { StaticImageData } from "next/image";
+import Image from "next/image";
 import gsap from "gsap";
 
 import {
@@ -463,7 +464,7 @@ export default function Hero({
           className="flex whitespace-nowrap will-change-transform"
         >
           {/* Group 1: GOHAR ABBAS SOFTWARE ENGINEER */}
-          <div className="flex items-center shrink-0 gap-6 sm:gap-10 md:gap-16 lg:gap-24 pr-6 sm:pr-10 md:pr-16 lg:pr-24">
+          <h1 aria-label="Gohar Abbas — Software Engineer" className="m-0 flex items-center shrink-0 gap-6 sm:gap-10 md:gap-16 lg:gap-24 pr-6 sm:pr-10 md:pr-16 lg:pr-24">
             {["GOHAR", "ABBAS", "SOFTWARE", "ENGINEER"].map((word, i) => (
               <span
                 key={`hw1-${i}`}
@@ -472,7 +473,7 @@ export default function Hero({
                 {word}
               </span>
             ))}
-          </div>
+          </h1>
 
           {/* Group 2: Exact identical duplicate for 100% seamless -50% loop */}
           <div className="flex items-center shrink-0 gap-6 sm:gap-10 md:gap-16 lg:gap-24 pr-6 sm:pr-10 md:pr-16 lg:pr-24" aria-hidden="true">
@@ -498,11 +499,17 @@ export default function Hero({
           ref={portraitRevealRef}
           className="relative h-[50vh] sm:h-[58vh] md:h-[66vh] lg:h-[74vh] max-h-[780px] w-auto max-w-[92vw] sm:max-w-[85vw] md:max-w-[75vw] lg:max-w-[900px] flex items-end justify-center origin-bottom will-change-transform"
         >
-          <img
+          <Image
             src={transparentPortraitSrc}
-            alt="Gohar Abbas"
+            alt="Portrait of Gohar Abbas"
+            sizes="(max-width: 640px) 92vw, (max-width: 1024px) 75vw, 900px"
+            width={portrait.width}
+            height={portrait.height}
+            preload
+            unoptimized={transparentPortraitSrc.startsWith("data:")}
             draggable={false}
             className="block h-full w-auto max-w-full object-contain object-bottom select-none filter drop-shadow-[0_16px_32px_rgba(0,0,0,0.18)] [mask-image:linear-gradient(to_bottom,black_92%,transparent_100%)]"
+            style={{ height: "100%", width: "auto" }}
           />
         </div>
       </div>

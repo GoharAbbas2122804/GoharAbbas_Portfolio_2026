@@ -16,8 +16,34 @@ const CtaSection = dynamic(() => import("@/components/ui/cta_section"));
 const Footer = dynamic(() => import("@/components/ui/footer"));
 
 export default function Home() {
+  const personSchema = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Gohar Abbas",
+    jobTitle: "Full-Stack Software Engineer",
+    description:
+      "Software engineer building web and mobile products, AI agents, and automation.",
+    knowsAbout: [
+      "Full-stack software development",
+      "Web application development",
+      "Mobile app development",
+      "AI agents and automation",
+      "Computer vision",
+    ],
+    sameAs: [
+      "https://github.com/GoharAbbas2122804",
+      "https://www.linkedin.com/in/gohar-abbas-106519321/",
+    ],
+  };
+
   return (
-    <main className="flex-1 relative bg-[#0b0b0c] min-h-screen text-white overflow-x-hidden">
+    <main id="main-content" tabIndex={-1} className="flex-1 relative bg-[#0b0b0c] min-h-screen text-white overflow-x-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(personSchema).replace(/</g, "\\u003c"),
+        }}
+      />
       <Navbar />
       <HeroAboutOverlay />
       <Timeline />

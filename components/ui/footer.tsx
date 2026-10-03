@@ -2,7 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { ArrowRight, Mail, Phone } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 /* ---------------- Social Icon SVG Components ---------------- */
 const ThreadsIcon = ({ className = "h-4 w-4", style }: { className?: string; style?: React.CSSProperties }) => (
@@ -120,15 +120,42 @@ const socialLinks = [
 
 /* ---------------- Footer Component ---------------- */
 export default function Footer() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (reducedMotion.matches) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          void video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    observer.observe(video);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <footer className="relative min-h-[85vh] lg:h-screen w-full overflow-hidden bg-black text-white border-t border-white/10 flex flex-col justify-between">
       
       {/* Background video */}
       <video
-        autoPlay
-        loop
+        ref={videoRef}
         muted
         playsInline
+        preload="none"
+        aria-hidden="true"
+        tabIndex={-1}
+        loop
         className="absolute inset-0 h-full w-full object-cover pointer-events-none"
         src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_170732_8a9ccda6-5cff-4628-b164-059c500a2b41.mp4"
       />
@@ -169,12 +196,12 @@ export default function Footer() {
         <div className="grid grid-cols-12 items-end gap-6 max-w-7xl mx-auto">
           
           <div className="col-span-12 lg:col-span-7 xl:col-span-8">
-            <h1
+            <h2
               className="font-medium leading-[0.8] tracking-[-0.07em] text-[24vw] sm:text-[22vw] md:text-[19vw] lg:text-[17vw] xl:text-[16vw]"
               style={{ color: "#E1E0CC" }}
             >
               <WordsPullUp text="GOHAR" showAsterisk />
-            </h1>
+            </h2>
           </div>
 
           <div className="col-span-12 flex flex-col gap-5 lg:col-span-5 xl:col-span-4 lg:pb-4">

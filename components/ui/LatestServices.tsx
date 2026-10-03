@@ -96,9 +96,9 @@ export default function LatestServices() {
           className="mb-20 flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
         >
           <div>
-            <h1 className="text-4xl font-light tracking-tighter text-white sm:text-6xl md:text-8xl">
+            <h2 className="text-4xl font-light tracking-tighter text-white sm:text-6xl md:text-8xl">
               Services <span className="text-neutral-600">Offered</span>
-            </h1>
+            </h2>
           </div>
           <div className="h-px flex-1 bg-neutral-900 mx-8 hidden md:block" />
           <p className="text-xs font-medium uppercase tracking-[0.3em] text-neutral-500">

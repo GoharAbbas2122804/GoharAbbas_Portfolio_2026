@@ -11,7 +11,7 @@ if (typeof window !== "undefined") {
 
 /* ── Tweak these ─────────────────────────────────────────────────────────── */
 const ABOUT_TEXT =
-  "I build fast, expressive web and mobile products for founders who care about the details. From the first sketch to the final deploy, I turn rough ideas into interfaces people actually enjoy using.";
+  "I’m Gohar Abbas, a full-stack software engineer in Pakistan. I build web applications, mobile apps, AI agents, and automation for founders and teams around the world.";
 
 const DIM_OPACITY = 0.15; // must match the `opacity-[0.15]` class on .about-char
 const PX_PER_CHAR = 14; // scroll distance per character (higher = slower reveal)

@@ -69,14 +69,6 @@ const BACKGROUND_CHUNKS: Array<() => Promise<unknown>> = [
   () => import("@/components/ui/footer"),
 ];
 
-// Only raw URLs rendered via plain <img> (work2026 cover art)
-const BACKGROUND_IMAGES: string[] = [
-  "/assets/projectImages/adminPanel.jpg",
-  "/assets/projectImages/Flow_Productivity_app.png",
-  "/assets/projectImages/layers_landingPage.jpeg",
-  "/assets/projectImages/metaData_keyboard_website.jpg",
-];
-
 // Display face for the name + counter.
 const display = Anton({ weight: "400", subsets: ["latin"], display: "swap" });
 
@@ -203,17 +195,9 @@ function whenIdle(fn: () => void, timeout: number) {
   }
 }
 
-/** Quietly fetch the rest of the site: JS chunks first, images after at low priority. */
+/** Warm section modules after the hero is safe; images load as their sections approach. */
 function loadInBackground() {
   whenIdle(() => BACKGROUND_CHUNKS.forEach((load) => load().catch(() => {})), 2000);
-  whenIdle(() => {
-    BACKGROUND_IMAGES.forEach((src) => {
-      const img = new Image();
-      img.setAttribute("fetchpriority", "low");
-      img.decoding = "async";
-      img.src = src;
-    });
-  }, 4000);
 }
 
 /* ================================================================== */

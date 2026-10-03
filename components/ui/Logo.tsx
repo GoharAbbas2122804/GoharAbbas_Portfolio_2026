@@ -2,6 +2,9 @@
 
 import React, { useRef, useEffect } from "react";
 import gsap from "gsap";
+import { Sacramento } from "next/font/google";
+
+const signatureFont = Sacramento({ subsets: ["latin"], weight: "400", display: "swap" });
 
 interface LogoProps {
   isVisible?: boolean;
@@ -19,19 +22,6 @@ export function Logo({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const underlineRef = useRef<SVGPathElement>(null);
   const textRef = useRef<SVGTextElement>(null);
-
-  // Load Google Font for handwriting script matching reference image
-  useEffect(() => {
-    const id = "gohar-signature-font";
-    if (!document.getElementById(id)) {
-      const link = document.createElement("link");
-      link.id = id;
-      link.rel = "stylesheet";
-      link.href =
-        "https://fonts.googleapis.com/css2?family=Sacramento&family=Dancing+Script:wght@500;700&display=swap";
-      document.head.appendChild(link);
-    }
-  }, []);
 
   // GSAP Handwriting stroke & reveal animation
   useEffect(() => {
@@ -122,7 +112,7 @@ export function Logo({
             x="4"
             y="22"
             className="fill-white font-normal text-[26px] sm:text-[28px] tracking-normal transition-colors duration-300 group-hover:fill-emerald-400"
-            style={{ fontFamily: "'Sacramento', 'Dancing Script', cursive" }}
+            style={{ fontFamily: signatureFont.style.fontFamily }}
           >
             Gohar
           </text>
@@ -149,4 +139,3 @@ export function Logo({
     </button>
   );
 }
-

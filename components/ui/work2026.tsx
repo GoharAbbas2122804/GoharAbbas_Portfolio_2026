@@ -2,6 +2,7 @@
 
 // A portfolio index built as a wheel you turn.
 import * as React from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -14,7 +15,7 @@ if (typeof window !== "undefined") {
 export interface WorksWheelItem {
   /** Project name. Shown beside the front card and in the index. */
   title: string;
-  /** Cover art. Any src an <img> takes. */
+  /** Cover art. Local public assets use Next's optimizer; other URLs use the browser directly. */
   image: string;
   /** Where the card links to. Omit for a wheel that only browses. */
   href?: string;
@@ -383,17 +384,32 @@ export function WorksWheel({
                   }}
                 >
                   <div className="bg-[#141416] border border-white/15 hover:border-emerald-500/50 shadow-2xl relative block size-full overflow-hidden rounded-2xl transition-all duration-300 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.9)]">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      draggable={false}
-                      onError={(e) => {
-                        // Fallback image handling
-                        const target = e.currentTarget;
-                        target.style.display = "none";
-                      }}
-                      className="size-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
-                    />
+                    {item.image.startsWith("/") ? (
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        fill
+                        sizes="(max-width: 640px) 88vw, 460px"
+                        quality={75}
+                        draggable={false}
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                        className="size-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                      />
+                    ) : (
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        loading="lazy"
+                        decoding="async"
+                        draggable={false}
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                        className="size-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                      />
+                    )}
 
                     {/* Gradient Overlay for visual quality & text contrast */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" />

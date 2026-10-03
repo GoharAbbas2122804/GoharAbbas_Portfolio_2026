@@ -1,6 +1,6 @@
 import type { StaticImageData } from "next/image";
 import { Playfair_Display, Space_Grotesk } from "next/font/google";
-import portrait from "@/app/assets/Images/portfolioProfile.jpeg";
+import portrait from "@/app/assets/Images/portfolioProfile.webp";
 
 // ---------------------------------------------------------------------------
 // Fonts — the signature didone serif + UI/mono labels (self-hosted by Next).
@@ -63,4 +63,3 @@ export const MOTION = {
   reducedFadeDuration: 0.4,
   reducedRectFadeDuration: 0.3,
 } as const;
-
