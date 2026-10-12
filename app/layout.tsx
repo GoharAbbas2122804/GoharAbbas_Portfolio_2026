@@ -40,6 +40,8 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
 };
 
+import VoiceCallTrigger from "@/components/ui/VoiceCallTrigger";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
@@ -61,6 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <Preloader />
         {children}
+        <VoiceCallTrigger />
       </body>
     </html>
   );
