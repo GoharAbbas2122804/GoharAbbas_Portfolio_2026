@@ -25,25 +25,25 @@ const SERVICES: ServiceItem[] = [
     id: "01",
     name: "Full Stack Web Systems",
     role: "Architecture & Engineering",
-    image: "/assets/services/fullstack_web.png",
+    image: "/assets/services/fullstack_web.webp",
   },
   {
     id: "02",
     name: "iOS & Android App Dev",
     role: "Mobile Native & Cross-Platform",
-    image: "/assets/services/mobile_app_dev.png",
+    image: "/assets/services/mobile_app_dev.webp",
   },
   {
     id: "03",
     name: "AI Agents Development",
     role: "Autonomous Workflows & Tools",
-    image: "/assets/services/ai_agents_dev.png",
+    image: "/assets/services/ai_agents_dev.webp",
   },
   {
     id: "04",
     name: "Computer Vision & AI Models",
     role: "Object Detection & Model Training",
-    image: "/assets/services/computer_vision_ai.png",
+    image: "/assets/services/computer_vision_ai.webp",
   },
 ];
 

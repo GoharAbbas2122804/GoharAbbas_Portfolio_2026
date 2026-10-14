@@ -37,73 +37,73 @@ export interface WorksWheelProps extends Omit<
 export const DEFAULT_PROJECT_ITEMS: WorksWheelItem[] = [
   {
     title: "Ghost AI Lead Generation",
-    image: "/assets/projectImages/Ghost_AI_Lead_Generation.png",
+    image: "/assets/projectImages/Ghost_AI_Lead_Generation.webp",
     href: "https://ghost-ai-beryl.vercel.app/dashboard",
     category: "AI & Automation",
   },
   {
     title: "Yaseen Medical Clinic",
-    image: "/assets/projectImages/yaseenMedicalClinic.png",
+    image: "/assets/projectImages/yaseenMedicalClinic.webp",
     href: "https://yaseenmedicalclinic.com/",
     category: "Healthcare Platform",
   },
   {
     title: "Royal Fragrance",
-    image: "/assets/projectImages/RoyalFragrances.png",
+    image: "/assets/projectImages/RoyalFragrances.webp",
     href: "https://royale-fragrances.vercel.app/",
     category: "Luxury E-Commerce",
   },
   {
     title: "Signalist Stock Analyzer",
-    image: "/assets/projectImages/signalist.jpeg",
+    image: "/assets/projectImages/signalist.webp",
     href: "https://signalist-stock-market-analyzer-rjo.vercel.app/",
     category: "Fintech & AI Analytics",
   },
   {
     title: "Admin Panel",
-    image: "/assets/projectImages/adminPanel.jpg",
+    image: "/assets/projectImages/adminPanel.webp",
     href: "https://admin-panel-pied-five.vercel.app/",
     category: "Enterprise Dashboard",
   },
   {
     title: "Layers Landing Page",
-    image: "/assets/projectImages/layers_landingPage.jpeg",
+    image: "/assets/projectImages/layers_landingPage.webp",
     href: "https://layers-landing-page-theta.vercel.app/",
     category: "SaaS Landing Page",
   },
   {
     title: "MetaData Keyboard Shop",
-    image: "/assets/projectImages/metaData_keyboard_website.jpg",
+    image: "/assets/projectImages/metaData_keyboard_website.webp",
     href: "https://metadata-mechanical-keyboard.vercel.app/",
     category: "3D Interactive Web",
   },
   {
     title: "Mojito Landing Page",
-    image: "/assets/projectImages/mojito_landingPage.jpg",
+    image: "/assets/projectImages/mojito_landingPage.webp",
     href: "https://mojito-landing-page-eight.vercel.app/",
     category: "Brand Showcase",
   },
   {
     title: "Nike Shoes Concept",
-    image: "/assets/projectImages/nike_shoes.jpeg",
+    image: "/assets/projectImages/nike_shoes.webp",
     href: "https://nike-shoes-jade.vercel.app/",
     category: "Interactive Footwear",
   },
   {
     title: "Zyrah E-Commerce",
-    image: "/assets/projectImages/zyrah_E_commerce.png",
+    image: "/assets/projectImages/zyrah_E_commerce.webp",
     href: "https://zyrah.vercel.app/",
     category: "Fashion E-Commerce",
   },
   {
     title: "Univoice Mobile App",
-    image: "/assets/projectImages/Univoice_Mobile_APp.png",
+    image: "/assets/projectImages/Univoice_Mobile_APp.webp",
     href: "https://github.com/GoharAbbas2122804/voicetovc",
     category: "Mobile Application",
   },
   {
     title: "Flow Productivity App",
-    image: "/assets/projectImages/Flow_Productivity_app.png",
+    image: "/assets/projectImages/Flow_Productivity_app.webp",
     href: "https://github.com/GoharAbbas2122804/Flow_Productivity-App",
     category: "Productivity System",
   },
@@ -424,8 +424,8 @@ export function WorksWheel({
                           // Prevent pointer drag handling from intercepting link clicks
                           e.stopPropagation();
                         }}
-                        aria-label={`Open ${item.title} in new tab`}
-                        className="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/70 hover:bg-emerald-500 text-white hover:text-black border border-white/20 hover:border-emerald-400 backdrop-blur-md text-xs font-semibold tracking-wide transition-all duration-300 shadow-lg hover:scale-105"
+                        aria-label={`${action || "View"} ${item.title} in new tab`}
+                        className="absolute top-3 right-3 z-20 flex items-center justify-center min-h-[36px] min-w-[36px] gap-1.5 px-3.5 py-2 rounded-full bg-black/70 hover:bg-emerald-500 text-white hover:text-black border border-white/20 hover:border-emerald-400 backdrop-blur-md text-xs font-semibold tracking-wide transition-all duration-300 shadow-lg hover:scale-105"
                       >
                         <span>{action}</span>
                         <svg

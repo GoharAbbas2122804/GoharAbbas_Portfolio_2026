@@ -5,7 +5,10 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, Sparkle } from "lucide-react";
 import gsap from "gsap";
+import { Oswald } from "next/font/google";
 import { Navbar } from "@/components/ui/menu_navbar";
+
+const oswald = Oswald({ subsets: ["latin"], weight: ["700"], variable: "--font-oswald", display: "swap" });
 
 const services = [
   "Website design & development",
@@ -94,7 +97,7 @@ export default function ContactPage() {
   };
 
   return (
-    <main id="main-content" ref={pageRef} tabIndex={-1} className="relative min-h-screen overflow-hidden bg-[#f3ede4] px-5 py-7 text-[#122315] sm:px-8 lg:px-12">
+    <main id="main-content" ref={pageRef} tabIndex={-1} className={`relative min-h-screen overflow-hidden bg-[#f3ede4] px-5 py-7 text-[#122315] sm:px-8 lg:px-12 ${oswald.variable}`}>
       <Navbar />
       <div className="pointer-events-none absolute -right-44 top-12 size-[30rem] rounded-full bg-[#55dd4a]/[0.08] blur-[130px]" />
 

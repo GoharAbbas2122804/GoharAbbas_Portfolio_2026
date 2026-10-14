@@ -1,0 +1,37 @@
+# Gohar Abbas - Portfolio
+
+> Full-stack software engineer building web applications, mobile apps, AI agents, and automation systems.
+
+## Summary
+- **Name**: Gohar Abbas
+- **Role**: Full-Stack Software Engineer & AI Developer
+- **Location**: Pakistan (Collaborating globally)
+- **Website**: https://goharabbas.vercel.app/
+- **GitHub**: https://github.com/GoharAbbas2122804
+- **LinkedIn**: https://www.linkedin.com/in/gohar-abbas-106519321/
+
+## Technical Expertise
+- **Frontend & Web Systems**: Next.js 16, React 19, TypeScript, Tailwind CSS, GSAP, Web Performance & Accessibility (WCAG 2.1)
+- **Backend & Cloud**: Node.js, RESTful APIs, Serverless Functions, Edge Computing, PostgreSQL, Vercel
+- **Mobile Development**: React Native, iOS & Android Cross-Platform Development
+- **AI & Automation**: Autonomous AI Agents, Claude Code, Tool Calling, Retrieval Augmented Generation (RAG), Scikit-Learn
+
+## Featured Projects
+- [Ghost AI Lead Generation](https://ghost-ai-beryl.vercel.app/dashboard): AI & Automation lead generation workflow dashboard.
+- [Yaseen Medical Clinic](https://yaseenmedicalclinic.com/): Comprehensive healthcare management and patient booking portal.
+- [Royale Fragrance](https://royale-fragrances.vercel.app/): Luxury e-commerce platform with responsive fluid design.
+- [Signalist Stock Analyzer](https://signalist-stock-market-analyzer-rjo.vercel.app/): Fintech analytics and market indicators engine.
+- [Univoice Mobile App](https://github.com/GoharAbbas2122804/voicetovc): Cross-platform mobile audio communication application.
+- [Flow Productivity App](https://github.com/GoharAbbas2122804/Flow_Productivity-App): High-performance workflow task management platform.
+
+## Certifications & Training
+- **Anthropic Academy**: Claude Code in Action (Agentic Workflows & CLI Tools)
+- **DeepLearning.AI & Stanford University**: Supervised Machine Learning
+- **DataCamp**: Introduction to AI Agents
+- **DataCamp**: GitHub Foundations (CI/CD Workflows)
+- **Meta**: Programming with JavaScript
+- **Google**: Technical Support Fundamentals
+
+## Contact & Project Inquiry
+- Project Inquiry: https://goharabbas.vercel.app/contact
+- Direct Voice Assistant: Interactive on-site AI voice agent available via web interface

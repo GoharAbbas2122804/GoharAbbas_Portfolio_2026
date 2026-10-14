@@ -103,22 +103,19 @@ export type ParallaxStripSliderProps = {
   backgroundColor?: string;
 };
 
-const R2 =
-  "https://pub-8abee449136941f5b0a1cd2c014534e9.r2.dev/vault-listing-images/assets-images/strip-paralax-slider";
-
 const DEFAULT_SLIDES: Slide[] = [
   {
-    src: `${R2}/img01.png`,
+    src: "/assets/services/slider/img01.webp",
     title: "Fire",
     chapter: "Collection 01",
   },
   {
-    src: `${R2}/img02.png`,
+    src: "/assets/services/slider/img02.webp",
     title: "Allure",
     chapter: "Collection 02",
   },
   {
-    src: `${R2}/img03.png`,
+    src: "/assets/services/slider/img03.webp",
     title: "Ember",
     chapter: "Collection 03",
   },
@@ -590,6 +587,8 @@ export default function Services({
             <img
               src={slide.src}
               alt=""
+              loading="lazy"
+              decoding="async"
               draggable={false}
               className="absolute inset-0 h-full w-full select-none object-cover"
             />
@@ -614,6 +613,8 @@ export default function Services({
         <img
           src={slides[current].src}
           alt={slides[current].title}
+          loading="lazy"
+          decoding="async"
           draggable={false}
           className="absolute inset-0 h-full w-full select-none object-cover"
         />

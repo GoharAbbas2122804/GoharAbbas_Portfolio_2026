@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 import type { StaticImageData } from "next/image";
 import Image from "next/image";
 import gsap from "gsap";
@@ -35,153 +35,6 @@ type TickFn = (time: number, deltaTime: number, frame: number, elapsed: number) 
 
 const rand = (min: number, max: number) => min + Math.random() * (max - min);
 
-/**
- * Custom hook to dynamically process the portrait JPEG image on an offscreen HTML canvas,
- * removing the white/light background rectangle and generating a 100% transparent PNG cutout.
- */
-function useTransparentPortrait(src: string) {
-  const [processedSrc, setProcessedSrc] = useState<string>(src);
-
-  useEffect(() => {
-    if (!src) return;
-
-    const img = new window.Image();
-    img.crossOrigin = "anonymous";
-    img.src = src;
-
-    img.onload = () => {
-      try {
-        const canvas = document.createElement("canvas");
-        const w = img.naturalWidth || img.width;
-        const h = img.naturalHeight || img.height;
-        canvas.width = w;
-        canvas.height = h;
-
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-
-        ctx.drawImage(img, 0, 0);
-        const imageData = ctx.getImageData(0, 0, w, h);
-        const data = imageData.data;
-
-        // Sample background color near corners (top-left)
-        const bgR = data[0];
-        const bgG = data[1];
-        const bgB = data[2];
-
-        // Connected flood-fill starting strictly from the outer boundaries.
-        // This ensures external background is made transparent while protected
-        // internal facial highlights (such as specular reflections on the nose)
-        // are NEVER reached or made transparent.
-        const totalPixels = w * h;
-        const visited = new Uint8Array(totalPixels);
-        const queue = new Int32Array(totalPixels);
-        let head = 0;
-        let tail = 0;
-
-        const isBgPixel = (idx: number) => {
-          const pi = idx * 4;
-          const r = data[pi];
-          const g = data[pi + 1];
-          const b = data[pi + 2];
-          const dr = r - bgR;
-          const dg = g - bgG;
-          const db = b - bgB;
-          const colorDist = Math.sqrt(dr * dr + dg * dg + db * db);
-          return colorDist < 46 || (r > 218 && g > 218 && b > 218);
-        };
-
-        // Seed all outer border pixels
-        for (let x = 0; x < w; x++) {
-          const topIdx = x;
-          const btmIdx = (h - 1) * w + x;
-          if (!visited[topIdx] && isBgPixel(topIdx)) {
-            visited[topIdx] = 1;
-            queue[tail++] = topIdx;
-          }
-          if (!visited[btmIdx] && isBgPixel(btmIdx)) {
-            visited[btmIdx] = 1;
-            queue[tail++] = btmIdx;
-          }
-        }
-        for (let y = 0; y < h; y++) {
-          const lIdx = y * w;
-          const rIdx = y * w + (w - 1);
-          if (!visited[lIdx] && isBgPixel(lIdx)) {
-            visited[lIdx] = 1;
-            queue[tail++] = lIdx;
-          }
-          if (!visited[rIdx] && isBgPixel(rIdx)) {
-            visited[rIdx] = 1;
-            queue[tail++] = rIdx;
-          }
-        }
-
-        // Breadth-first search along connected background only
-        while (head < tail) {
-          const idx = queue[head++];
-          const cx = idx % w;
-          const cy = (idx / w) | 0;
-
-          if (cx > 0) {
-            const left = idx - 1;
-            if (!visited[left] && isBgPixel(left)) {
-              visited[left] = 1;
-              queue[tail++] = left;
-            }
-          }
-          if (cx < w - 1) {
-            const right = idx + 1;
-            if (!visited[right] && isBgPixel(right)) {
-              visited[right] = 1;
-              queue[tail++] = right;
-            }
-          }
-          if (cy > 0) {
-            const up = idx - w;
-            if (!visited[up] && isBgPixel(up)) {
-              visited[up] = 1;
-              queue[tail++] = up;
-            }
-          }
-          if (cy < h - 1) {
-            const down = idx + w;
-            if (!visited[down] && isBgPixel(down)) {
-              visited[down] = 1;
-              queue[tail++] = down;
-            }
-          }
-        }
-
-        // Apply transparency strictly to visited connected background pixels
-        for (let idx = 0; idx < totalPixels; idx++) {
-          if (visited[idx] === 1) {
-            const pi = idx * 4;
-            const r = data[pi];
-            const g = data[pi + 1];
-            const b = data[pi + 2];
-            const avgLightness = (r + g + b) / 3;
-            if (avgLightness > 235) {
-              data[pi + 3] = 0; // Completely transparent
-            } else {
-              // Smooth edge anti-aliasing / feathering
-              const alphaRatio = Math.max(0, (235 - avgLightness) / 20);
-              data[pi + 3] = Math.floor(alphaRatio * 255);
-            }
-          }
-        }
-
-        ctx.putImageData(imageData, 0, 0);
-        setProcessedSrc(canvas.toDataURL("image/png"));
-      } catch (err) {
-        console.warn("Portrait background processing fallback:", err);
-      }
-    };
-  }, [src]);
-
-  return processedSrc;
-}
-
 export type HeroProps = {
   /** Extra classes merged onto the section. */
   className?: string;
@@ -213,8 +66,6 @@ export default function Hero({
   const arrowRef = useRef<SVGSVGElement>(null);
   const marqueeTrackRef = useRef<HTMLDivElement>(null);
 
-  // Automatically remove white background rectangle to turn image into a seamless cutout
-  const transparentPortraitSrc = useTransparentPortrait(portrait.src);
 
   const nameParts = name.trim().split(/\s+/);
   const firstName = nameParts[0] || "GOHAR";
@@ -317,12 +168,11 @@ export default function Hero({
     // GSAP Master Timeline & Motion
     const ctx = gsap.context(() => {
       if (reduced) {
-        gsap.fromTo(portraitReveal, { autoAlpha: 0 }, { autoAlpha: 1, duration: MOTION.reducedFadeDuration, ease: "power1.out" });
         gsap.to(rectState, { opacity: 1, duration: MOTION.reducedRectFadeDuration, ease: "none", onUpdate: draw });
         return;
       }
 
-      gsap.set(portraitReveal, { autoAlpha: 0, scale: 0.95 });
+      gsap.set(portraitReveal, { opacity: 1, scale: 0.96 });
 
       const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
 
@@ -330,12 +180,11 @@ export default function Hero({
       tl.to(
         portraitReveal,
         {
-          autoAlpha: 1,
           scale: 1,
           duration: MOTION.portraitRiseDuration,
           ease: "power2.out",
         },
-        0.2
+        0.1
       );
 
       // Canvas Rectangles Fade
@@ -402,9 +251,22 @@ export default function Hero({
       }
     }, root);
 
+    let isHeroVisible = true;
+    let io: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver !== "undefined") {
+      io = new IntersectionObserver(
+        ([entry]) => {
+          isHeroVisible = entry.isIntersecting;
+        },
+        { threshold: 0.05 }
+      );
+      io.observe(root);
+    }
+
     // Canvas animation ticker loop
     if (!reduced) {
       const tickFn: TickFn = (_time, deltaTime) => {
+        if (!isHeroVisible) return;
         const s = deltaTime / 1000;
         rectState.time += s;
         for (const r of rects) {
@@ -425,6 +287,7 @@ export default function Hero({
     resizeObserver.observe(root);
 
     return () => {
+      io?.disconnect();
       resizeObserver.disconnect();
       if (tick) gsap.ticker.remove(tick);
       removeMove?.();
@@ -500,13 +363,13 @@ export default function Hero({
           className="relative h-[50vh] sm:h-[58vh] md:h-[66vh] lg:h-[74vh] max-h-[780px] w-auto max-w-[92vw] sm:max-w-[85vw] md:max-w-[75vw] lg:max-w-[900px] flex items-end justify-center origin-bottom will-change-transform"
         >
           <Image
-            src={transparentPortraitSrc}
+            src={portrait}
             alt="Portrait of Gohar Abbas"
             sizes="(max-width: 640px) 92vw, (max-width: 1024px) 75vw, 900px"
             width={portrait.width}
             height={portrait.height}
-            preload
-            unoptimized={transparentPortraitSrc.startsWith("data:")}
+            priority
+            fetchPriority="high"
             draggable={false}
             className="block h-full w-auto max-w-full object-contain object-bottom select-none filter drop-shadow-[0_16px_32px_rgba(0,0,0,0.18)] [mask-image:linear-gradient(to_bottom,black_92%,transparent_100%)]"
             style={{ height: "100%", width: "auto" }}

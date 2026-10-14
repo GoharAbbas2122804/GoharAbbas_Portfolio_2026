@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { JetBrains_Mono, Manrope, Oswald, Space_Grotesk } from "next/font/google";
+import { JetBrains_Mono, Manrope, Space_Grotesk } from "next/font/google";
 import Preloader from "@/components/preloader";
 import { siteUrl } from "@/lib/site";
 
-const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-code" });
-const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space" });
-const manrope = Manrope({ subsets: ["latin"], variable: "--font-body" });
-const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald", weight: ["400", "500", "600", "700"] });
+const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-code", display: "swap" });
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space", display: "swap" });
+const manrope = Manrope({ subsets: ["latin"], variable: "--font-body", display: "swap" });
 
 export const metadata: Metadata = {
   ...(siteUrl ? { metadataBase: siteUrl, alternates: { canonical: "/" } } : {}),
@@ -47,13 +46,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("h-full", "antialiased", jetbrainsMono.variable, spaceGrotesk.variable, manrope.variable, oswald.variable)}
+      className={cn("h-full", "antialiased", jetbrainsMono.variable, spaceGrotesk.variable, manrope.variable)}
     >
       <head>
         <script
           dangerouslySetInnerHTML={{
             __html:
-              'try{sessionStorage.removeItem("gohar:preloader-seen")}catch(e){}',
+              'try{if(sessionStorage.getItem("gohar:preloader-seen")){document.documentElement.dataset.plSeen="1";document.documentElement.dataset.plDone="true";}}catch(e){}',
           }}
         />
       </head>

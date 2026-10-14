@@ -135,16 +135,10 @@
   }
 }
 
-/* Gate hero entrance until preloader curtain starts lifting (or returning visitor in same session) */
-@keyframes pl-failsafe {
-  to {
-    visibility: visible;
-  }
-}
-
+/* Allow hero to render immediately behind preloader curtain for fast FCP/LCP */
 html:not([data-pl-done]) [data-hero-reveal] {
-  visibility: hidden;
-  animation: pl-failsafe 0s 12s forwards;
+  /* Curtain handles visual masking; DOM rendering is preserved */
+  content-visibility: visible;
 }
 
 /* About section (components/ui/about.tsx) */

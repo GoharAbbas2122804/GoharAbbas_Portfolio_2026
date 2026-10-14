@@ -18,26 +18,31 @@ export function Navbar() {
 
   // Scroll direction detection: visible at top or when scrolling up, hidden when scrolling down
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
 
-      if (isMenuOpen) {
-        setIsVisible(true);
-        return;
+          if (isMenuOpen) {
+            setIsVisible(true);
+          } else if (currentScrollY < 100) {
+            setIsVisible(true);
+          } else {
+            const diff = currentScrollY - lastScrollY.current;
+            if (diff > 8) {
+              setIsVisible(false);
+            } else if (diff < -8) {
+              setIsVisible(true);
+            }
+          }
+
+          lastScrollY.current = currentScrollY;
+          ticking = false;
+        });
+        ticking = true;
       }
-
-      if (currentScrollY < 100) {
-        setIsVisible(true);
-      } else {
-        const diff = currentScrollY - lastScrollY.current;
-        if (diff > 8) {
-          setIsVisible(false);
-        } else if (diff < -8) {
-          setIsVisible(true);
-        }
-      }
-
-      lastScrollY.current = currentScrollY;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });

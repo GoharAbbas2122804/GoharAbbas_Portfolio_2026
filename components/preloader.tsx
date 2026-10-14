@@ -30,8 +30,8 @@ const ROLE = "Full-stack developer";
 const CLOCK = { label: "PKT", timeZone: "Asia/Karachi" };
 const PHASES = ["Getting ready", "Loading visuals", "Almost there", "Welcome"];
 
-const MIN_DURATION = 2.4; // seconds: the counter never finishes faster than this
-const HARD_TIMEOUT = 10_000; // ms: safety valve so nobody is ever stuck on the loader
+const MIN_DURATION = 0.9; // seconds: snappy pacing that preserves the full visual counter
+const HARD_TIMEOUT = 8_000; // ms: safety valve so nobody is ever stuck on the loader
 const WAVE = 0.06; // how far each letter's fill lags the previous letter
 const SEEN_KEY = "gohar:preloader-seen"; // sessionStorage flag (also used in the <head> script)
 
@@ -54,20 +54,10 @@ const CRITICAL_IMAGES: string[] = [
 const CRITICAL_CHUNKS: Array<() => Promise<unknown>> = [];
 
 /**
- * WHAT LOADS QUIETLY AFTER THE HERO IS SAFE (never blocks the counter)
- * A dynamic import() warms the module cache, so a later
- * next/dynamic(() => import("same/path")) resolves instantly.
+ * Empty background chunk warming to avoid blocking the main thread with 8 simultaneous chunks.
+ * Next.js on-demand dynamic imports handle below-the-fold sections naturally.
  */
-const BACKGROUND_CHUNKS: Array<() => Promise<unknown>> = [
-  () => import("@/components/ui/timeline"),
-  () => import("@/components/ui/services"),
-  () => import("@/components/ui/work2026"),
-  () => import("@/components/ui/certificates"),
-  () => import("@/components/ui/LatestServices"),
-  () => import("@/components/ui/testimonials"),
-  () => import("@/components/ui/cta_section"),
-  () => import("@/components/ui/footer"),
-];
+const BACKGROUND_CHUNKS: Array<() => Promise<unknown>> = [];
 
 // Display face for the name + counter.
 const display = Anton({ weight: "400", subsets: ["latin"], display: "swap" });
@@ -258,15 +248,21 @@ export default function Preloader() {
       if (announced) return;
       announced = true;
       html.dataset.plDone = "true";
+      html.dataset.plSeen = "1";
+      try {
+        sessionStorage.setItem(SEEN_KEY, "1");
+      } catch {}
       html.style.overflow = ""; // unlock scroll
       window.dispatchEvent(new CustomEvent("preloader:done"));
     };
 
-    // Reset status on reload so preloader runs every time
-    delete html.dataset.plDone;
-    delete html.dataset.plSeen;
+    // If already seen in this session, skip preloader immediately
     try {
-      sessionStorage.removeItem(SEEN_KEY);
+      if (sessionStorage.getItem(SEEN_KEY) || html.dataset.plSeen === "1") {
+        announce();
+        setGone(true);
+        return;
+      }
     } catch {}
 
     // First visit: start at the top with scroll locked while we load.
@@ -378,14 +374,14 @@ export default function Preloader() {
         }
         gsap
           .timeline({ onComplete: () => setGone(true) })
-          .to("[data-rise]", { yPercent: -130, duration: 0.6, ease: "power3.in", stagger: 0.05 }, "+=0.3")
-          .to(inners, { yPercent: -118, rotate: -7, duration: 0.9, ease: "expo.inOut", stagger: 0.06 }, "-=0.25")
-          .addLabel("curtain", "-=0.5")
-          .to(curtain, { y: -1, duration: 1.2, ease: "expo.inOut", onUpdate: drawCurtain }, "curtain")
-          .to(curtain, { c: 28, duration: 0.6, ease: "sine.out", onUpdate: drawCurtain }, "curtain")
-          .to(curtain, { c: 0, duration: 0.6, ease: "sine.in", onUpdate: drawCurtain }, "curtain+=0.6")
+          .to("[data-rise]", { yPercent: -130, duration: 0.45, ease: "power3.in", stagger: 0.04 }, "+=0.15")
+          .to(inners, { yPercent: -118, rotate: -7, duration: 0.65, ease: "expo.inOut", stagger: 0.04 }, "-=0.2")
+          .addLabel("curtain", "-=0.35")
+          .to(curtain, { y: -1, duration: 0.85, ease: "expo.inOut", onUpdate: drawCurtain }, "curtain")
+          .to(curtain, { c: 24, duration: 0.45, ease: "sine.out", onUpdate: drawCurtain }, "curtain")
+          .to(curtain, { c: 0, duration: 0.45, ease: "sine.in", onUpdate: drawCurtain }, "curtain+=0.4")
           // let the page start its own entrance while the curtain is still lifting
-          .call(announce, undefined, "curtain+=0.35");
+          .call(announce, undefined, "curtain+=0.15");
       });
     };
 
@@ -397,7 +393,7 @@ export default function Preloader() {
     let cancelled = false;
 
     const pace = gsap.parseEase("power1.inOut");
-    const minDuration = reduced ? 0.8 : MIN_DURATION;
+    const minDuration = reduced ? 0.3 : MIN_DURATION;
 
     const tick: gsap.TickerCallback = (_time, deltaMs) => {
       if (finished) return;
