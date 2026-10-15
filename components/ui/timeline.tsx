@@ -193,7 +193,7 @@ export default function Timeline() {
           {/* Section Intro Block */}
           <div className="w-[85vw] max-w-[460px] shrink-0 space-y-5 pr-6">
             <span className={`text-xs font-bold uppercase tracking-[0.22em] text-zinc-400 ${spaceGrotesk.className}`}>
-              // Career Storyline
+              {"// Career Storyline"}
             </span>
             <h2 className={`text-4xl md:text-6xl font-black uppercase tracking-tight leading-[0.96] text-white ${syne.className}`}>
               HOW I BUILT MY{" "}

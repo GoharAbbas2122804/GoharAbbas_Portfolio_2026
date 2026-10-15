@@ -123,9 +123,9 @@ function ReviewCard({ quote, name, role, location, project }: Testimonial) {
     <article className="testimonial-card group relative w-[320px] sm:w-[380px] shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[#131316]/90 p-5 sm:p-6 shadow-xl backdrop-blur-md transition-all duration-300 hover:border-white/30 hover:bg-[#18181c] hover:shadow-2xl">
       <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3.5">
         <div>
-          <h4 className={`text-base font-bold text-white tracking-tight ${spaceGrotesk.className}`}>
+          <p className={`text-base font-bold text-white tracking-tight ${spaceGrotesk.className}`}>
             {name}
-          </h4>
+          </p>
           <p className="text-xs text-zinc-400">
             {role} · <span className="text-zinc-500">{location}</span>
           </p>
@@ -138,7 +138,7 @@ function ReviewCard({ quote, name, role, location, project }: Testimonial) {
         </span>
       </div>
       <p className="text-xs sm:text-sm leading-relaxed text-zinc-300 line-clamp-4">
-        "{quote}"
+        &ldquo;{quote}&rdquo;
       </p>
       <div className="mt-4 flex items-center justify-between pt-3 border-t border-white/5 text-[11px]">
         <span className={`font-semibold uppercase tracking-wider text-zinc-400 group-hover:text-white transition-colors ${spaceGrotesk.className}`}>
@@ -192,10 +192,14 @@ export function StaggerTestimonials() {
     let speedProxy: { v: number } | null = null;
     let decayTimer: number | undefined;
 
-    const ctx = gsap.context(() => {
-      const headerBits = headerRef.current
-        ? headerRef.current.querySelectorAll(".testimonial-header-item")
-        : [];
+    let ctx: gsap.Context | null = null;
+    let observer: IntersectionObserver | null = null;
+
+    const init = () => {
+      ctx = gsap.context(() => {
+        const headerBits = headerRef.current
+          ? headerRef.current.querySelectorAll(".testimonial-header-item")
+          : [];
       const title = titleRef.current;
       const divider = section.querySelector<HTMLElement>(".testimonial-divider");
       const dot = section.querySelector<HTMLElement>(".testimonial-dot");
@@ -205,7 +209,8 @@ export function StaggerTestimonials() {
 
       if (title) {
         title.querySelectorAll<HTMLElement>("[data-split]").forEach((el) => {
-          splits.push(new SplitText(el, { type: "words" }));
+          splits.push(new SplitText(el, { type: "words", aria: "none" }));
+          el.removeAttribute("aria-label");
         });
       }
       const words = splits.flatMap((split) => split.words);
@@ -374,15 +379,33 @@ export function StaggerTestimonials() {
         .then(() => ScrollTrigger.refresh())
         .catch(() => undefined);
     }
+  };
 
-    return () => {
-      ctx.revert();
-      splits.forEach((split) => split.revert());
-      window.clearTimeout(decayTimer);
-      if (speedProxy) gsap.killTweensOf(speedProxy);
-      listeners.forEach((off) => off());
-    };
-  }, []);
+  if (typeof window !== "undefined" && "IntersectionObserver" in window) {
+    observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          init();
+          observer?.disconnect();
+          observer = null;
+        }
+      },
+      { rootMargin: "600px 0px" }
+    );
+    observer.observe(section);
+  } else {
+    init();
+  }
+
+  return () => {
+    observer?.disconnect();
+    ctx?.revert();
+    splits.forEach((split) => split.revert());
+    window.clearTimeout(decayTimer);
+    if (speedProxy) gsap.killTweensOf(speedProxy);
+    listeners.forEach((off) => off());
+  };
+}, []);
 
   return (
     <section
@@ -413,6 +436,7 @@ export function StaggerTestimonials() {
 
         <h2
           ref={titleRef}
+          aria-label="What Clients Say After We Shipped"
           className={`testimonial-title text-[clamp(2.1rem,min(6vw,4.5rem),4.5rem)] font-black uppercase leading-[0.95] tracking-[-0.02em] text-white ${syne.className}`}
         >
           <span data-split className="block">

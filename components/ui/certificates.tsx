@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import Image from "next/image";
 import gsap from "gsap";
@@ -165,7 +165,15 @@ export default function Certificates({
   const zIndexRef = useRef(DEFAULT_IMAGE_Z_INDEX);
   const pointerTargetRef = useRef({ x: 0, y: 0 });
   const pointerCurrentRef = useRef({ x: 0, y: 0 });
-  const [isCoarsePointer, setIsCoarsePointer] = useState(false);
+  const isCoarsePointer = useSyncExternalStore(
+    (callback) => {
+      const mq = window.matchMedia?.("(pointer: coarse)");
+      mq?.addEventListener?.("change", callback);
+      return () => mq?.removeEventListener?.("change", callback);
+    },
+    () => window.matchMedia?.("(pointer: coarse)")?.matches ?? false,
+    () => false
+  );
   const reduceMotionRef = useRef(
     typeof window !== "undefined" &&
       (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false)
@@ -186,112 +194,135 @@ export default function Certificates({
     const listeners: Array<() => void> = [];
     const splits: SplitText[] = [];
 
-    const ctx = gsap.context(() => {
-      const headerBits = headerRef.current
-        ? headerRef.current.querySelectorAll(".cert-header-item")
-        : [];
-      const title = titleRef.current;
-      const divider = section.querySelector<HTMLElement>(".cert-divider");
-      const dot = section.querySelector<HTMLElement>(".cert-dot");
+    let ctx: gsap.Context | null = null;
+    let observer: IntersectionObserver | null = null;
 
-      if (title) {
-        title.querySelectorAll<HTMLElement>("[data-split]").forEach((el) => {
-          splits.push(new SplitText(el, { type: "words" }));
-        });
-      }
-      const words = splits.flatMap((split) => split.words);
+    const init = () => {
+      ctx = gsap.context(() => {
+        const headerBits = headerRef.current
+          ? headerRef.current.querySelectorAll(".cert-header-item")
+          : [];
+        const title = titleRef.current;
+        const divider = section.querySelector<HTMLElement>(".cert-divider");
+        const dot = section.querySelector<HTMLElement>(".cert-dot");
 
-      if (reduceMotion) {
-        gsap.set(headerBits, { autoAlpha: 1, y: 0 });
-        gsap.set(words, { autoAlpha: 1, yPercent: 0 });
-        gsap.set(divider, { scaleX: 1 });
-        return;
-      }
+        if (title) {
+          title.querySelectorAll<HTMLElement>("[data-split]").forEach((el) => {
+            splits.push(new SplitText(el, { type: "words", aria: "none" }));
+            el.removeAttribute("aria-label");
+          });
+        }
+        const words = splits.flatMap((split) => split.words);
 
-      gsap.set(headerBits, { autoAlpha: 0, y: 20 });
-      gsap.set(words, { autoAlpha: 0, yPercent: 70 });
-      gsap.set(divider, { scaleX: 0 });
+        if (reduceMotion) {
+          gsap.set(headerBits, { autoAlpha: 1, y: 0 });
+          gsap.set(words, { autoAlpha: 1, yPercent: 0 });
+          gsap.set(divider, { scaleX: 1 });
+          return;
+        }
 
-      // Entrance timeline
-      const intro = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: "top 75%",
-          once: true,
-        },
-        defaults: { ease: "power3.out" },
-      });
+        gsap.set(headerBits, { autoAlpha: 0, y: 20 });
+        gsap.set(words, { autoAlpha: 0, yPercent: 70 });
+        gsap.set(divider, { scaleX: 0 });
 
-      intro
-        .to(headerBits, { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.08 }, 0)
-        .to(
-          words,
-          { autoAlpha: 1, yPercent: 0, duration: 0.85, stagger: 0.08, ease: "power4.out" },
-          0.1
-        )
-        .to(divider, { scaleX: 1, duration: 0.8, ease: "power3.inOut" }, 0.45);
-
-      // Section Mouse move Spotlight Effect
-      const spot = section.querySelector<HTMLElement>(".cert-spotlight");
-      if (spot && canHover) {
-        gsap.set(spot, { xPercent: -50, yPercent: -50, autoAlpha: 0 });
-        const xTo = gsap.quickTo(spot, "x", { duration: 0.55, ease: "power3" });
-        const yTo = gsap.quickTo(spot, "y", { duration: 0.55, ease: "power3" });
-        const fade = gsap.to(spot, {
-          autoAlpha: 1,
-          duration: 0.45,
-          paused: true,
-          overwrite: "auto",
+        // Entrance timeline
+        const intro = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: "top 75%",
+            once: true,
+          },
+          defaults: { ease: "power3.out" },
         });
 
-        const onMove = (event: PointerEvent) => {
-          const rect = section.getBoundingClientRect();
-          xTo(event.clientX - rect.left);
-          yTo(event.clientY - rect.top);
-          fade.play();
-        };
-        const onLeave = () => fade.reverse();
+        intro
+          .to(headerBits, { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.08 }, 0)
+          .to(
+            words,
+            { autoAlpha: 1, yPercent: 0, duration: 0.85, stagger: 0.08, ease: "power4.out" },
+            0.1
+          )
+          .to(divider, { scaleX: 1, duration: 0.8, ease: "power3.inOut" }, 0.45);
 
-        section.addEventListener("pointermove", onMove);
-        section.addEventListener("pointerleave", onLeave);
-        listeners.push(() => {
-          section.removeEventListener("pointermove", onMove);
-          section.removeEventListener("pointerleave", onLeave);
-        });
-      }
+        // Section Mouse move Spotlight Effect
+        const spot = section.querySelector<HTMLElement>(".cert-spotlight");
+        if (spot && canHover) {
+          gsap.set(spot, { xPercent: -50, yPercent: -50, autoAlpha: 0 });
+          const xTo = gsap.quickTo(spot, "x", { duration: 0.55, ease: "power3" });
+          const yTo = gsap.quickTo(spot, "y", { duration: 0.55, ease: "power3" });
+          const fade = gsap.to(spot, {
+            autoAlpha: 1,
+            duration: 0.45,
+            paused: true,
+            overwrite: "auto",
+          });
 
-      // Pulsing Dot Animation
-      if (dot) {
-        gsap.set(dot, {
-          transformOrigin: "50% 50%",
-          boxShadow: "0 0 10px rgba(255,255,255,0.85)",
-        });
-        gsap.to(dot, {
-          scale: 1.5,
-          boxShadow: "0 0 22px rgba(255,255,255,1)",
-          duration: 1.15,
+          const onMove = (event: PointerEvent) => {
+            const rect = section.getBoundingClientRect();
+            xTo(event.clientX - rect.left);
+            yTo(event.clientY - rect.top);
+            fade.play();
+          };
+          const onLeave = () => fade.reverse();
+
+          section.addEventListener("pointermove", onMove);
+          section.addEventListener("pointerleave", onLeave);
+          listeners.push(() => {
+            section.removeEventListener("pointermove", onMove);
+            section.removeEventListener("pointerleave", onLeave);
+          });
+        }
+
+        // Pulsing Dot Animation
+        if (dot) {
+          gsap.set(dot, {
+            transformOrigin: "50% 50%",
+            boxShadow: "0 0 10px rgba(255,255,255,0.85)",
+          });
+          gsap.to(dot, {
+            scale: 1.5,
+            boxShadow: "0 0 22px rgba(255,255,255,1)",
+            duration: 1.15,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+          });
+        }
+
+        // Text Gradient Shift
+        gsap.to(".cert-gradient", {
+          backgroundPosition: "200% 0%",
+          duration: 9,
           repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
+          ease: "none",
+          delay: 1.5,
         });
+      }, section);
+
+      if (typeof document !== "undefined" && document.fonts) {
+        document.fonts.ready.then(() => ScrollTrigger.refresh()).catch(() => undefined);
       }
+    };
 
-      // Text Gradient Shift
-      gsap.to(".cert-gradient", {
-        backgroundPosition: "200% 0%",
-        duration: 9,
-        repeat: -1,
-        ease: "none",
-        delay: 1.5,
-      });
-    }, section);
-
-    if (typeof document !== "undefined" && document.fonts) {
-      document.fonts.ready.then(() => ScrollTrigger.refresh()).catch(() => undefined);
+    if (typeof window !== "undefined" && "IntersectionObserver" in window) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0]?.isIntersecting) {
+            init();
+            observer?.disconnect();
+            observer = null;
+          }
+        },
+        { rootMargin: "600px 0px" }
+      );
+      observer.observe(section);
+    } else {
+      init();
     }
 
     return () => {
-      ctx.revert();
+      observer?.disconnect();
+      ctx?.revert();
       splits.forEach((split) => split.revert());
       listeners.forEach((off) => off());
     };
@@ -321,19 +352,6 @@ export default function Certificates({
 
     mq.addEventListener?.("change", onChange);
     return () => mq.removeEventListener?.("change", onChange);
-  }, []);
-
-  useEffect(() => {
-    const coarseMq = window.matchMedia?.("(pointer: coarse)");
-    if (!coarseMq) return;
-
-    const onChange = (event: MediaQueryListEvent) => {
-      setIsCoarsePointer(event.matches);
-    };
-
-    setIsCoarsePointer(coarseMq.matches);
-    coarseMq.addEventListener?.("change", onChange);
-    return () => coarseMq.removeEventListener?.("change", onChange);
   }, []);
 
   // Pointer follow animation ticker
@@ -597,6 +615,7 @@ export default function Certificates({
 
         <h2
           ref={titleRef}
+          aria-label="Certificates I Have Mastered"
           className={`cert-title text-[clamp(1.8rem,min(5vw,6.5dvh),3.6rem)] font-black uppercase leading-[0.95] tracking-[-0.02em] text-white ${syne.className}`}
         >
           <span data-split className="block">

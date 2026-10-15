@@ -425,7 +425,7 @@ export function WorksWheel({
                           e.stopPropagation();
                         }}
                         aria-label={`${action || "View"} ${item.title} in new tab`}
-                        className="absolute top-3 right-3 z-20 flex items-center justify-center min-h-[36px] min-w-[36px] gap-1.5 px-3.5 py-2 rounded-full bg-black/70 hover:bg-emerald-500 text-white hover:text-black border border-white/20 hover:border-emerald-400 backdrop-blur-md text-xs font-semibold tracking-wide transition-all duration-300 shadow-lg hover:scale-105"
+                        className="absolute top-3 right-3 z-20 flex items-center justify-center min-h-[44px] min-w-[44px] gap-1.5 px-3.5 py-2.5 rounded-full bg-black/70 hover:bg-emerald-500 text-white hover:text-black border border-white/20 hover:border-emerald-400 backdrop-blur-md text-xs font-semibold tracking-wide transition-all duration-300 shadow-lg hover:scale-105"
                       >
                         <span>{action}</span>
                         <svg

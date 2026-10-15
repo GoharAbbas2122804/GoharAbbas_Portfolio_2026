@@ -19,7 +19,6 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { usePathname } from "next/navigation";
 import { Anton } from "next/font/google";
 import gsap from "gsap";
-import { PORTRAIT } from "@/components/ui/hero.constants";
 
 /* ================================================================== */
 /* 1. CONFIG: tweak everything here                                    */
@@ -43,12 +42,10 @@ const PALETTE = {
 };
 
 /**
- * WHAT THE COUNTER WAITS FOR (keep this list small: only what the first screen needs)
- * Use the EXACT URLs your hero renders, otherwise the browser downloads twice.
+ * Hero priority image is already handled by Next.js <Image priority /> and preloaded in <head>.
+ * Keeping this empty avoids duplicate download of unoptimized raw image asset.
  */
-const CRITICAL_IMAGES: string[] = [
-  PORTRAIT.src,
-];
+const CRITICAL_IMAGES: string[] = [];
 
 // Statically imported hero components removed; kept empty for truly async chunks
 const CRITICAL_CHUNKS: Array<() => Promise<unknown>> = [];
@@ -392,8 +389,9 @@ export default function Preloader() {
     let finished = false;
     let cancelled = false;
 
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    const minDuration = reduced ? 0.3 : isMobile ? 0.6 : MIN_DURATION;
     const pace = gsap.parseEase("power1.inOut");
-    const minDuration = reduced ? 0.3 : MIN_DURATION;
 
     const tick: gsap.TickerCallback = (_time, deltaMs) => {
       if (finished) return;
@@ -413,8 +411,12 @@ export default function Preloader() {
     render(0);
     gsap.ticker.add(tick);
 
+    const preloadTasks: Task[] = [fontsTask, pageLoadTask];
+    if (CRITICAL_IMAGES.length > 0) preloadTasks.push(imageTask(CRITICAL_IMAGES));
+    if (CRITICAL_CHUNKS.length > 0) preloadTasks.push(chunkTask(CRITICAL_CHUNKS));
+
     runPreload(
-      [fontsTask, pageLoadTask, imageTask(CRITICAL_IMAGES), chunkTask(CRITICAL_CHUNKS)],
+      preloadTasks,
       (p) => {
         if (!cancelled) target = p;
       },

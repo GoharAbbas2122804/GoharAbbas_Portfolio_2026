@@ -15,6 +15,21 @@ const nextConfig: NextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
+  experimental: {
+    // Inline CSS to eliminate render-blocking stylesheet requests.
+    // Turbopack produces ~6 separate CSS link chunks that block FCP/LCP by ~750ms.
+    // inlineCss embeds all styles in the HTML response, removing the waterfall.
+    // Ideal here: Tailwind (atomic, small CSS) + portfolio (mostly first-time visitors).
+    inlineCss: true,
+
+    // Tree-shake large icon/animation packages so only used exports are bundled.
+    // lucide-react is already optimized by default; adding the rest.
+    optimizePackageImports: [
+      "@phosphor-icons/react",
+      "framer-motion",
+    ],
+  },
+
   // HTTP Security and Performance Headers for Vercel
   async headers() {
     return [
@@ -62,3 +77,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
