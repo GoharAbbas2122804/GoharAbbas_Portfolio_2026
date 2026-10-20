@@ -37,6 +37,9 @@ export const metadata: Metadata = {
     images: ["/opengraph-image.png"],
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
+  verification: {
+    google: "8uxc3lek-yNP3YSrd8jphFDj9IneXTs8veuRxI2Bh_Q",
+  },
 };
 
 import VoiceCallTrigger from "@/components/ui/VoiceCallTrigger";
